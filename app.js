@@ -154,10 +154,8 @@
     if (p.img) { $("pImg").src = p.img; pol.hidden = false; } else pol.hidden = true;
   }
   function fillNews(p) {
-    const j = JOURNAL?.projects?.[p.id], nw = j?.entries || [];
+    const j = JOURNAL?.projects?.[p.id];
     $("pY").textContent = p.year + (p.status ? " · " + p.status : "") + (j ? " · màj " + fmt(j.last) : "");
-    $("pNews").hidden = !nw.length;
-    $("pNewsList").innerHTML = nw.slice(0, 4).map(e => `<li><time datetime="${e.date}">${fmt(e.date)}</time><span>${e.url ? `<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.text)}</a>` : esc(e.text)}</span></li>`).join("");
   }
   function spinUp() {
     timers.forEach(clearTimeout); timers = [];
