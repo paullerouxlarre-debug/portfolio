@@ -15,3 +15,10 @@ Bande-son : chaque disque a un titre Spotify (champ `song` dans `projects.js`), 
 Faces : A sites, B applis, C vidéo, D labo, E IA & agents. Champ `status` facultatif (Abandonné, En pause…) affiché en autocollant.
 
 Hébergement prévu : GitHub Pages (branche `main`, dossier racine).
+
+## Mise à jour automatique (journal des nouveautés)
+
+- `outils/maj.py` rassemble les nouvelles dans `data/journal.json`, affiché dans la rubrique « Nouveautés », sur les pochettes (ruban « Neuf » si moins de 7 jours) et dans la platine.
+- Sources : les commits des dépôts GitHub listés dans `data/sources.json`, et les lignes de `data/journal-manuel.json`.
+- Le robot `.github/workflows/journal.yml` relance la collecte toutes les 6 heures (et à la main : onglet Actions → « Journal du bac » → Run workflow).
+- Projets du QG (privé) : seules les sections `## Journal public` des pages projet portant `portfolio: <id>` dans leur en-tête sont reprises, avec `python3 outils/maj.py --qg ~/Documents/CLAUDE/QG`, puis commit et push. Format d'une ligne : `- 2026-11-25 — Ce qui a changé`.

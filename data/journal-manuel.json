@@ -1,0 +1,15 @@
+[
+  { "date": "2026-11-04", "id": "palier", "text": "Dossier de lancement et prototype jouable de l'app" },
+  { "date": "2026-11-13", "id": "check-occaz", "text": "Maquette de la page de lancement mise à jour" },
+  { "date": "2026-11-13", "id": "histoires", "text": "Nouveau rythme en test : 21 vidéos par semaine, trois styles animés comparés" },
+  { "date": "2026-11-14", "id": "explorations", "text": "Les agents analysent Y Combinator : 10 modèles chiffrés et un top 5 des pistes" },
+  { "date": "2026-11-16", "id": "visite-en-couches", "text": "Prototype v1 refusé : le projet reste au stade d'exploration" },
+  { "date": "2026-11-16", "id": "shape-brume", "text": "Démo 3D temps réel d'une planche de surf" },
+  { "date": "2026-11-16", "id": "pin-sec", "text": "Version 3 : l'assemblage se construit au défilement" },
+  { "date": "2026-11-16", "id": "sable-et-sel", "text": "Version 2 : le tour de potier sous le curseur" },
+  { "date": "2026-11-17", "id": "egurra", "text": "Vitrine premium en mouvement, sans aucune photo" },
+  { "date": "2026-11-17", "id": "gouf", "text": "Vitrine de surf shop (démo fictive)" },
+  { "date": "2026-11-18", "id": "agents", "text": "Projet abandonné : l'équipe de 18 agents laisse place au second cerveau" },
+  { "date": "2026-11-18", "id": "qg", "text": "Refonte en second cerveau rangé par sujets et relié en réseau" },
+  { "date": "2026-11-23", "id": "garage-3d", "text": "Plans cotés v3 et essai de maquette 3D à partir d'un croquis" }
+]

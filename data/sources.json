@@ -1,0 +1,12 @@
+{
+  "_aide": "Projets suivis automatiquement sur GitHub. match / exclude : filtre (regex) sur la première ligne du message de commit.",
+  "owner": "paullerouxlarre-debug",
+  "projets": {
+    "cartonnages-larre": { "repo": "cartonnages-larre" },
+    "binocles": { "repo": "aumondedesbinocles" },
+    "fournil": { "repo": "fournil-des-chaouches" },
+    "mes-collections": { "repo": "mes-collections", "exclude": "^Atlas 1302" },
+    "atlas-1302": { "repo": "mes-collections", "match": "^Atlas 1302" },
+    "rythme": { "repo": "rythme" }
+  }
+}

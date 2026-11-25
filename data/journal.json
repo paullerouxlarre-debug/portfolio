@@ -1,0 +1,551 @@
+{
+ "generated": "2026-11-25T21:30:09Z",
+ "projects": {
+  "cartonnages-larre": {
+   "last": "2026-11-25",
+   "entries": [
+    {
+     "date": "2026-11-25",
+     "text": "Accueil : ouverture pilotée par étapes (gestes et boutons), page tenue en haut, rythme par encre, déchets évacués, boîte centrée et tournable",
+     "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/5abc2ff0be450398f3d072269d52a927f2163ca2",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-25",
+     "text": "Accueil : défilement tenu par l'ouverture, rythme régulier, boîte finale à tourner",
+     "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/834aa32b2663fafe84001bd5588b3c83fc07fd52",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-25",
+     "text": "Accueil : repères de défilement visibles, étape en cours affichée, chapitres ralentis",
+     "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/3398f9379c5337c85c53f8de7f72bf4879b028c7",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-25",
+     "text": "Film : rendu HD suréchantillonné, plus lumineux, avec musique originale",
+     "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/8826d7725bb31cd41997ac6d7df22992e190582c",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-25",
+     "text": "Accueil : arrêts sur scènes posées, grain hors de la feuille ; film plus lumineux, rendu suréchantillonné, musique originale",
+     "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/170b3c2402326543ce0c11900698b9f271c89f95",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-24",
+     "text": "Accueil : sujet en grand, grain de papier, orange réservé à l'accent",
+     "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/e86dfce571f6b63a9de5ec84d367de2b7ce24238",
+     "source": "github"
+    }
+   ]
+  },
+  "garage-3d": {
+   "last": "2026-11-23",
+   "entries": [
+    {
+     "date": "2026-11-23",
+     "text": "Plans cotés v3 et essai de maquette 3D à partir d'un croquis",
+     "source": "journal"
+    }
+   ]
+  },
+  "binocles": {
+   "last": "2026-11-18",
+   "entries": [
+    {
+     "date": "2026-11-18",
+     "text": "Devanture et place d'après la photo récente et Street View, infos du site officiel",
+     "url": "https://github.com/paullerouxlarre-debug/aumondedesbinocles/commit/5f10cb71849761edd3b583cab13ce400a7fdc828",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-18",
+     "text": "La place autour de la boutique : immeuble, tour rouge, porche, voisins, arbres",
+     "url": "https://github.com/paullerouxlarre-debug/aumondedesbinocles/commit/50f21590baab0d095cf00a7e6635b769fbbb3e6d",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-18",
+     "text": "Site d'Au Monde des Binocles",
+     "url": "https://github.com/paullerouxlarre-debug/aumondedesbinocles/commit/e223b21269a936a9c809e9cb8cc7ceb769e2535d",
+     "source": "github"
+    }
+   ]
+  },
+  "agents": {
+   "last": "2026-11-18",
+   "entries": [
+    {
+     "date": "2026-11-18",
+     "text": "Projet abandonné : l'équipe de 18 agents laisse place au second cerveau",
+     "source": "journal"
+    }
+   ]
+  },
+  "qg": {
+   "last": "2026-11-18",
+   "entries": [
+    {
+     "date": "2026-11-18",
+     "text": "Refonte en second cerveau rangé par sujets et relié en réseau",
+     "source": "journal"
+    }
+   ]
+  },
+  "fournil": {
+   "last": "2026-11-17",
+   "entries": [
+    {
+     "date": "2026-11-17",
+     "text": "Équipe illustrée : Bastien, Manon et Sophie (personnages imaginés)",
+     "url": "https://github.com/paullerouxlarre-debug/fournil-des-chaouches/commit/b56634bef538a36aca3b9f1dfa12070e38f848f8",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-17",
+     "text": "Site du Fournil des Chaouches",
+     "url": "https://github.com/paullerouxlarre-debug/fournil-des-chaouches/commit/42a1dbaca2cc1af0622cb273aad60b6bdcfeb4e5",
+     "source": "github"
+    }
+   ]
+  },
+  "egurra": {
+   "last": "2026-11-17",
+   "entries": [
+    {
+     "date": "2026-11-17",
+     "text": "Vitrine premium en mouvement, sans aucune photo",
+     "source": "journal"
+    }
+   ]
+  },
+  "gouf": {
+   "last": "2026-11-17",
+   "entries": [
+    {
+     "date": "2026-11-17",
+     "text": "Vitrine de surf shop (démo fictive)",
+     "source": "journal"
+    }
+   ]
+  },
+  "visite-en-couches": {
+   "last": "2026-11-16",
+   "entries": [
+    {
+     "date": "2026-11-16",
+     "text": "Prototype v1 refusé : le projet reste au stade d'exploration",
+     "source": "journal"
+    }
+   ]
+  },
+  "shape-brume": {
+   "last": "2026-11-16",
+   "entries": [
+    {
+     "date": "2026-11-16",
+     "text": "Démo 3D temps réel d'une planche de surf",
+     "source": "journal"
+    }
+   ]
+  },
+  "pin-sec": {
+   "last": "2026-11-16",
+   "entries": [
+    {
+     "date": "2026-11-16",
+     "text": "Version 3 : l'assemblage se construit au défilement",
+     "source": "journal"
+    }
+   ]
+  },
+  "sable-et-sel": {
+   "last": "2026-11-16",
+   "entries": [
+    {
+     "date": "2026-11-16",
+     "text": "Version 2 : le tour de potier sous le curseur",
+     "source": "journal"
+    }
+   ]
+  },
+  "explorations": {
+   "last": "2026-11-14",
+   "entries": [
+    {
+     "date": "2026-11-14",
+     "text": "Les agents analysent Y Combinator : 10 modèles chiffrés et un top 5 des pistes",
+     "source": "journal"
+    }
+   ]
+  },
+  "check-occaz": {
+   "last": "2026-11-13",
+   "entries": [
+    {
+     "date": "2026-11-13",
+     "text": "Maquette de la page de lancement mise à jour",
+     "source": "journal"
+    }
+   ]
+  },
+  "histoires": {
+   "last": "2026-11-13",
+   "entries": [
+    {
+     "date": "2026-11-13",
+     "text": "Nouveau rythme en test : 21 vidéos par semaine, trois styles animés comparés",
+     "source": "journal"
+    }
+   ]
+  },
+  "atlas-1302": {
+   "last": "2026-11-09",
+   "entries": [
+    {
+     "date": "2026-11-09",
+     "text": "Atlas 1302 : menu trié, page Valeur de revente, réglages partagés entre les pages",
+     "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/66d693377214949ba102fbcea1b5f202cb7672e3",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-09",
+     "text": "Atlas 1302 : comparaison de marché élargie (97 annonces, 8 pays, 1300/1302/1303)",
+     "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/24324294f640dd164de2f34ae826573dd5bebb4b",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-09",
+     "text": "Atlas 1302 : expertise IA (note, valeur face au marché, chantier) à partir des photos",
+     "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/8502ba76e16a7f9de43aee4fd4ed4339eb02c243",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-09",
+     "text": "Atlas 1302 : valeur de revente (relevé de marché du 9 novembre 2026) dans le budget",
+     "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/13ffcc78ce67800bf991e5d076290da17788b983",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-09",
+     "text": "Atlas 1302 : détail des factures mis en page pour PC",
+     "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/017097cc64e42bc0792d38d00fc751ec17c00a07",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-09",
+     "text": "Atlas 1302 : bouton Confirmer le payeur sur les factures, section Qui a payé quoi retirée",
+     "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/b98fcbf2239194b2054db69d354c05958bde1430",
+     "source": "github"
+    }
+   ]
+  },
+  "mes-collections": {
+   "last": "2026-11-06",
+   "entries": [
+    {
+     "date": "2026-11-06",
+     "text": "Ajout de l'atlas d'atelier de la Coccinelle 1302 (atlas-1302/)",
+     "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/07d6fac0591bd608c445d8adeef75770762eeda4",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-04",
+     "text": "Accueil : mentions légales pour Papo, et page d'accueil sans défilement sur ordinateur",
+     "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/47f25539e1d3d78adf20f6b603f82f49e98afe92",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-04",
+     "text": "Pièces : second objectif « Objectif années » pour les faces nationales",
+     "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/afdcc0cdf509b56f707542da76794e09485d1798",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-03",
+     "text": "Photos des cartes sans moiré : trame adoucie puis réduction par étapes",
+     "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/c19f0a3594e633e85879e624a72ffc051b076e65",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-03",
+     "text": "Pièces : années à cocher pour les faces nationales, 30 images officielles ajoutées",
+     "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/94bf4de4ab389f1ab2c1190a6ab38997a51570b5",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-03",
+     "text": "Verso reconstitué façon vraie carte postale ; timbre corrigé (plus de grille pixélisée)",
+     "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/6b8a5681e706514fc64d18259f72b9d99863add3",
+     "source": "github"
+    }
+   ]
+  },
+  "rythme": {
+   "last": "2026-11-05",
+   "entries": [
+    {
+     "date": "2026-11-05",
+     "text": "Journal : course isolée",
+     "url": "https://github.com/paullerouxlarre-debug/rythme/commit/aa98420ef4c5af939adf623fde975460237192b7",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-05",
+     "text": "Pas : la course est isolée dans les pas Santé au lieu d'être ajoutée",
+     "url": "https://github.com/paullerouxlarre-debug/rythme/commit/3289fe1bd02718d7e31483098c8a6fbb4b334dae",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-05",
+     "text": "Journal : pas et stats",
+     "url": "https://github.com/paullerouxlarre-debug/rythme/commit/94efd14feb9d5bb5c9b790a71747124b4b902468",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-05",
+     "text": "Pas : stats détaillées, pas des courses ajoutés, graphiques sans chevauchement",
+     "url": "https://github.com/paullerouxlarre-debug/rythme/commit/33bc6fa386c2fefc5dd3da6c57f0729a28630f59",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-05",
+     "text": "Cerveau : journal planning",
+     "url": "https://github.com/paullerouxlarre-debug/rythme/commit/13213e5146f598d823d05b7032f0ddb36475aac0",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-05",
+     "text": "Planning façon Outlook : plage de jours, saisie rapide, raccourcis, modification, balayage",
+     "url": "https://github.com/paullerouxlarre-debug/rythme/commit/658db1251d62a4ce84f288e2b9632a5b81235ed3",
+     "source": "github"
+    }
+   ]
+  },
+  "palier": {
+   "last": "2026-11-04",
+   "entries": [
+    {
+     "date": "2026-11-04",
+     "text": "Dossier de lancement et prototype jouable de l'app",
+     "source": "journal"
+    }
+   ]
+  }
+ },
+ "feed": [
+  {
+   "date": "2026-11-25",
+   "id": "cartonnages-larre",
+   "text": "Accueil : ouverture pilotée par étapes (gestes et boutons), page tenue en haut, rythme par encre, déchets évacués, boîte centrée et tournable",
+   "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/5abc2ff0be450398f3d072269d52a927f2163ca2",
+   "source": "github",
+   "more": 4
+  },
+  {
+   "date": "2026-11-24",
+   "id": "cartonnages-larre",
+   "text": "Accueil : sujet en grand, grain de papier, orange réservé à l'accent",
+   "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/e86dfce571f6b63a9de5ec84d367de2b7ce24238",
+   "source": "github"
+  },
+  {
+   "date": "2026-11-23",
+   "id": "cartonnages-larre",
+   "text": "Film du process recalculé (HD et 720p mobile), nouvelle affiche",
+   "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/c99f1a068e63a59add5fae9bb4ddb1334803cc05",
+   "source": "github",
+   "more": 5
+  },
+  {
+   "date": "2026-11-23",
+   "id": "garage-3d",
+   "text": "Plans cotés v3 et essai de maquette 3D à partir d'un croquis",
+   "source": "journal"
+  },
+  {
+   "date": "2026-11-22",
+   "id": "cartonnages-larre",
+   "text": "Film du process : suite d'images haute définition et MP4 recalculés (v=7)",
+   "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/b93033b627d87be631513c66e4ef691950edc95a",
+   "source": "github",
+   "more": 13
+  },
+  {
+   "date": "2026-11-21",
+   "id": "cartonnages-larre",
+   "text": "Poursuit le mouvement du carton pendant la découpe et le collage",
+   "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/041dce02558c4a15b4d33bc597c6de511d253544",
+   "source": "github",
+   "more": 1
+  },
+  {
+   "date": "2026-11-20",
+   "id": "cartonnages-larre",
+   "text": "Raconte la fabrication d’un étui dans un atelier animé en 3D",
+   "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/df3b131d60b8a996c1650ea4467cbf78182791f4",
+   "source": "github"
+  },
+  {
+   "date": "2026-11-19",
+   "id": "cartonnages-larre",
+   "text": "Documente le site et ses sources",
+   "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/a85d28e45a89672f63498804436362bba878e338",
+   "source": "github",
+   "more": 3
+  },
+  {
+   "date": "2026-11-18",
+   "id": "binocles",
+   "text": "Devanture et place d'après la photo récente et Street View, infos du site officiel",
+   "url": "https://github.com/paullerouxlarre-debug/aumondedesbinocles/commit/5f10cb71849761edd3b583cab13ce400a7fdc828",
+   "source": "github",
+   "more": 2
+  },
+  {
+   "date": "2026-11-18",
+   "id": "agents",
+   "text": "Projet abandonné : l'équipe de 18 agents laisse place au second cerveau",
+   "source": "journal"
+  },
+  {
+   "date": "2026-11-18",
+   "id": "qg",
+   "text": "Refonte en second cerveau rangé par sujets et relié en réseau",
+   "source": "journal"
+  },
+  {
+   "date": "2026-11-17",
+   "id": "fournil",
+   "text": "Équipe illustrée : Bastien, Manon et Sophie (personnages imaginés)",
+   "url": "https://github.com/paullerouxlarre-debug/fournil-des-chaouches/commit/b56634bef538a36aca3b9f1dfa12070e38f848f8",
+   "source": "github",
+   "more": 1
+  },
+  {
+   "date": "2026-11-17",
+   "id": "egurra",
+   "text": "Vitrine premium en mouvement, sans aucune photo",
+   "source": "journal"
+  },
+  {
+   "date": "2026-11-17",
+   "id": "gouf",
+   "text": "Vitrine de surf shop (démo fictive)",
+   "source": "journal"
+  },
+  {
+   "date": "2026-11-16",
+   "id": "visite-en-couches",
+   "text": "Prototype v1 refusé : le projet reste au stade d'exploration",
+   "source": "journal"
+  },
+  {
+   "date": "2026-11-16",
+   "id": "shape-brume",
+   "text": "Démo 3D temps réel d'une planche de surf",
+   "source": "journal"
+  },
+  {
+   "date": "2026-11-16",
+   "id": "pin-sec",
+   "text": "Version 3 : l'assemblage se construit au défilement",
+   "source": "journal"
+  },
+  {
+   "date": "2026-11-16",
+   "id": "sable-et-sel",
+   "text": "Version 2 : le tour de potier sous le curseur",
+   "source": "journal"
+  },
+  {
+   "date": "2026-11-14",
+   "id": "explorations",
+   "text": "Les agents analysent Y Combinator : 10 modèles chiffrés et un top 5 des pistes",
+   "source": "journal"
+  },
+  {
+   "date": "2026-11-13",
+   "id": "check-occaz",
+   "text": "Maquette de la page de lancement mise à jour",
+   "source": "journal"
+  },
+  {
+   "date": "2026-11-13",
+   "id": "histoires",
+   "text": "Nouveau rythme en test : 21 vidéos par semaine, trois styles animés comparés",
+   "source": "journal"
+  },
+  {
+   "date": "2026-11-09",
+   "id": "atlas-1302",
+   "text": "Atlas 1302 : menu trié, page Valeur de revente, réglages partagés entre les pages",
+   "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/66d693377214949ba102fbcea1b5f202cb7672e3",
+   "source": "github",
+   "more": 9
+  },
+  {
+   "date": "2026-11-06",
+   "id": "mes-collections",
+   "text": "Ajout de l'atlas d'atelier de la Coccinelle 1302 (atlas-1302/)",
+   "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/07d6fac0591bd608c445d8adeef75770762eeda4",
+   "source": "github"
+  },
+  {
+   "date": "2026-11-06",
+   "id": "atlas-1302",
+   "text": "Atlas 1302 : lien personnel qui enregistre la clé Gemini sur l'appareil",
+   "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/9939474b75feed0bc0de17a0faa7dda8da809192",
+   "source": "github",
+   "more": 2
+  },
+  {
+   "date": "2026-11-05",
+   "id": "rythme",
+   "text": "Journal : course isolée",
+   "url": "https://github.com/paullerouxlarre-debug/rythme/commit/aa98420ef4c5af939adf623fde975460237192b7",
+   "source": "github",
+   "more": 5
+  },
+  {
+   "date": "2026-11-04",
+   "id": "mes-collections",
+   "text": "Accueil : mentions légales pour Papo, et page d'accueil sans défilement sur ordinateur",
+   "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/47f25539e1d3d78adf20f6b603f82f49e98afe92",
+   "source": "github",
+   "more": 1
+  },
+  {
+   "date": "2026-11-04",
+   "id": "palier",
+   "text": "Dossier de lancement et prototype jouable de l'app",
+   "source": "journal"
+  },
+  {
+   "date": "2026-11-03",
+   "id": "mes-collections",
+   "text": "Photos des cartes sans moiré : trame adoucie puis réduction par étapes",
+   "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/c19f0a3594e633e85879e624a72ffc051b076e65",
+   "source": "github",
+   "more": 2
+  },
+  {
+   "date": "2026-11-03",
+   "id": "rythme",
+   "text": "Cerveau : journal exercices",
+   "url": "https://github.com/paullerouxlarre-debug/rythme/commit/c897c2cc14f5da86aea8e0386530db407b47acca",
+   "source": "github",
+   "more": 19
+  },
+  {
+   "date": "2026-10-30",
+   "id": "mes-collections",
+   "text": "Retire des captures de test ajoutées par erreur",
+   "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/654883df2dce50958d6190a7ab81790f752d57c6",
+   "source": "github"
+  }
+ ]
+}

@@ -9,14 +9,18 @@
   P.forEach(p => { const f = CATS[p.cat].face; counters[f] = (counters[f] || 0) + 1; p.k = f + counters[f]; });
   $("count").textContent = P.length;
 
-  let filter = "all", list = P.slice(), cur = 0;
+  let filter = "all", list = P.slice(), cur = 0, JOURNAL = null;
+  const lastOf = p => JOURNAL?.projects?.[p.id]?.last;
+  const isFresh = p => { const l = lastOf(p); return !!l && (new Date(JOURNAL.generated) - new Date(l)) / 864e5 <= 7; };
+  const fmt = d => new Date(d + "T12:00:00").toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
 
   // ── pochette ──
   function artHTML(p) {
     const style = `--c1:${p.c[0]};--c2:${p.c[1]};--c3:${p.c[2]}` + (p.img ? `;--img:url('${p.img}')` : "");
     const cls = p.img ? "photo" : p.art;
     const big = p.title.replace(/^(Le |La |Les |Au |Atelier )/, "").charAt(0);
-    return `<div class="art ${cls}" style="${style}">
+    const fresh = isFresh(p) ? `<div class="ribbon">Neuf</div>` : "";
+    return `<div class="art ${cls}" style="${style}">${fresh}
       <div class="pattern" data-big="${esc(big)}"></div>
       <div class="cat"><span>${esc(CATS[p.cat].label)}</span><span>PR-${esc(p.k)}</span></div>
       <h3>${esc(p.title)}</h3>
@@ -114,11 +118,12 @@
   window.addEventListener("resize", layout);
 
   // ── liste des titres ──
-  $("sides").innerHTML = Object.entries(CATS).map(([k, v]) => `
+  const drawSides = () => $("sides").innerHTML = Object.entries(CATS).map(([k, v]) => `
     <div class="side"><h3>Face ${v.face} — ${v.label}</h3>
     ${P.filter(p => p.cat === k).map(p => `<button class="row" data-id="${p.id}">
-      <span class="k">${p.k}</span><span><b>${esc(p.title)}</b><span>${esc(p.tagline)}</span></span><span class="y">${p.year}</span></button>`).join("")}
+      <span class="k">${p.k}</span><span><b>${esc(p.title)}</b><span>${esc(p.tagline)}</span></span><span class="y">${lastOf(p) ? "màj " + fmt(lastOf(p)) : p.year}</span></button>`).join("")}
     </div>`).join("");
+  drawSides();
   $("sides").addEventListener("click", e => {
     const r = e.target.closest(".row"); if (!r) return;
     openPlayer(P.find(p => p.id === r.dataset.id));
@@ -135,6 +140,7 @@
     $("pN").textContent = `Face ${CATS[p.cat].face} · ${CATS[p.cat].label} · ${p.k}`;
     $("pY").textContent = p.year + (p.status ? " · " + p.status : "");
     spotify.show(p);
+    fillNews(p);
     $("pTitle").textContent = p.title;
     $("pTag").textContent = p.tagline;
     $("pDesc").textContent = p.desc;
@@ -146,6 +152,12 @@
     }).join("") : `<span class="btn" aria-disabled="true">Disque privé, pas d'écoute publique</span>`;
     const pol = $("polaroid");
     if (p.img) { $("pImg").src = p.img; pol.hidden = false; } else pol.hidden = true;
+  }
+  function fillNews(p) {
+    const j = JOURNAL?.projects?.[p.id], nw = j?.entries || [];
+    $("pY").textContent = p.year + (p.status ? " · " + p.status : "") + (j ? " · màj " + fmt(j.last) : "");
+    $("pNews").hidden = !nw.length;
+    $("pNewsList").innerHTML = nw.slice(0, 4).map(e => `<li><time datetime="${e.date}">${fmt(e.date)}</time><span>${e.url ? `<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.text)}</a>` : esc(e.text)}</span></li>`).join("");
   }
   function spinUp() {
     timers.forEach(clearTimeout); timers = [];
@@ -274,6 +286,31 @@
   })();
 
   build(0);
+
+  // ── journal des nouveautés (data/journal.json, mis à jour par le robot GitHub) ──
+  function journal() {
+    fetch("data/journal.json?t=" + Date.now()).then(r => r.ok ? r.json() : null).then(j => {
+      if (!j) return;
+      JOURNAL = j;
+      build(cur); drawSides();
+      const byId = Object.fromEntries(P.map(p => [p.id, p]));
+      const feed = j.feed.filter(e => byId[e.id]);
+      $("feed").innerHTML = feed.slice(0, 12).map(e => {
+        const p = byId[e.id];
+        return `<li style="--c1:${p.c[0]}"><span class="dot"></span><time datetime="${e.date}">${fmt(e.date)} · ${esc(CATS[p.cat].label)}</time>
+          <button data-id="${p.id}">${esc(p.title)}</button><p>${esc(e.text)}</p>${e.more ? `<span class="more">+ ${e.more} autre${e.more > 1 ? "s" : ""} modification${e.more > 1 ? "s" : ""} ce jour-là</span>` : ""}</li>`;
+      }).join("");
+      $("ticker").innerHTML = feed.slice(0, 10).map(e => `<span><b>${fmt(e.date)}</b>${esc(byId[e.id].title)} — ${esc(e.text)}</span>`).join("");
+      const g = new Date(j.generated);
+      $("newsStamp").innerHTML = `<b>Mise à jour automatique</b><br>dernière collecte le ${g.toLocaleDateString("fr-FR")} à ${g.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}`;
+      $("nouveautes").hidden = false;
+      if (playing && player.classList.contains("open")) fillNews(playing);
+    }).catch(() => {});
+  }
+  $("feed").addEventListener("click", e => {
+    const b = e.target.closest("button[data-id]"); if (b) openPlayer(P.find(p => p.id === b.dataset.id));
+  });
+  journal();
 
   // Lien direct vers un disque : …/#disque=fournil
   const fromHash = () => {
