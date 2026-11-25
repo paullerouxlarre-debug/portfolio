@@ -90,12 +90,16 @@ def main():
             p["entries"].append({k: v for k, v in e.items() if k != "id"})
 
     # fil : un résumé par projet et par jour (évite qu'un projet très actif noie les autres)
-    fil, vus = [], {}
+    # au plus 2 jours par projet, pour que le fil reste varié
+    fil, vus, par_projet = [], {}, {}
     for e in tout:
         k = (e["id"], e["date"])
         if k in vus:
             vus[k]["more"] = vus[k].get("more", 0) + 1
             continue
+        if par_projet.get(e["id"], 0) >= 2:
+            continue
+        par_projet[e["id"]] = par_projet.get(e["id"], 0) + 1
         vus[k] = dict(e)
         fil.append(vus[k])
     sortie = {

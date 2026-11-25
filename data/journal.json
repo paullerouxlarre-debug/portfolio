@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-25T21:30:09Z",
+ "generated": "2026-11-25T21:32:09Z",
  "projects": {
   "cartonnages-larre": {
    "last": "2026-11-25",
@@ -354,48 +354,9 @@
   },
   {
    "date": "2026-11-23",
-   "id": "cartonnages-larre",
-   "text": "Film du process recalculé (HD et 720p mobile), nouvelle affiche",
-   "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/c99f1a068e63a59add5fae9bb4ddb1334803cc05",
-   "source": "github",
-   "more": 5
-  },
-  {
-   "date": "2026-11-23",
    "id": "garage-3d",
    "text": "Plans cotés v3 et essai de maquette 3D à partir d'un croquis",
    "source": "journal"
-  },
-  {
-   "date": "2026-11-22",
-   "id": "cartonnages-larre",
-   "text": "Film du process : suite d'images haute définition et MP4 recalculés (v=7)",
-   "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/b93033b627d87be631513c66e4ef691950edc95a",
-   "source": "github",
-   "more": 13
-  },
-  {
-   "date": "2026-11-21",
-   "id": "cartonnages-larre",
-   "text": "Poursuit le mouvement du carton pendant la découpe et le collage",
-   "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/041dce02558c4a15b4d33bc597c6de511d253544",
-   "source": "github",
-   "more": 1
-  },
-  {
-   "date": "2026-11-20",
-   "id": "cartonnages-larre",
-   "text": "Raconte la fabrication d’un étui dans un atelier animé en 3D",
-   "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/df3b131d60b8a996c1650ea4467cbf78182791f4",
-   "source": "github"
-  },
-  {
-   "date": "2026-11-19",
-   "id": "cartonnages-larre",
-   "text": "Documente le site et ses sources",
-   "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/a85d28e45a89672f63498804436362bba878e338",
-   "source": "github",
-   "more": 3
   },
   {
    "date": "2026-11-18",
@@ -526,26 +487,11 @@
   },
   {
    "date": "2026-11-03",
-   "id": "mes-collections",
-   "text": "Photos des cartes sans moiré : trame adoucie puis réduction par étapes",
-   "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/c19f0a3594e633e85879e624a72ffc051b076e65",
-   "source": "github",
-   "more": 2
-  },
-  {
-   "date": "2026-11-03",
    "id": "rythme",
    "text": "Cerveau : journal exercices",
    "url": "https://github.com/paullerouxlarre-debug/rythme/commit/c897c2cc14f5da86aea8e0386530db407b47acca",
    "source": "github",
    "more": 19
-  },
-  {
-   "date": "2026-10-30",
-   "id": "mes-collections",
-   "text": "Retire des captures de test ajoutées par erreur",
-   "url": "https://github.com/paullerouxlarre-debug/mes-collections/commit/654883df2dce50958d6190a7ab81790f752d57c6",
-   "source": "github"
   }
  ]
 }
