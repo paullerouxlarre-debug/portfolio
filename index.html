@@ -17,7 +17,7 @@
   <nav>
     <a href="#bac">Le bac</a>
     <a href="#titres">Liste des titres</a>
-    <button class="sound" id="sound" aria-pressed="false" title="Activer le son de la platine"><span class="eq"><b></b><b></b><b></b></span><span id="soundTxt">Son coupé</span></button>
+    <button class="sound" id="sound" aria-pressed="true" title="Lancer automatiquement la bande-son de chaque disque"><span class="eq"><b></b><b></b><b></b></span><span id="soundTxt">Musique auto</span></button>
   </nav>
 </header>
 
@@ -26,7 +26,7 @@
     <div>
       <p class="kicker">Disquaire de projets · fait avec l'IA</p>
       <h1>Fouillez <br>le <em>bac.</em></h1>
-      <p>Sites internet, applis, vidéos et expériences du labo : chaque pochette est un projet que j'ai créé avec l'IA. Feuilletez, tirez un disque, posez-le sur la platine.</p>
+      <p>Sites internet, applis, vidéos, agents IA et expériences du labo : chaque pochette est un projet que j'ai créé avec l'IA. Feuilletez, tirez un disque, posez-le sur la platine.</p>
     </div>
     <div class="stamp"><div><b id="count">0</b>disques<br>en rayon</div></div>
   </section>
@@ -77,6 +77,7 @@
       <p class="desc" id="pDesc"></p>
       <h4>Pistes</h4><ol id="pTracks"></ol>
       <h4>Matériel</h4><div class="chips" id="pTech"></div>
+      <div class="spot" id="pSpot" hidden><h4>Bande-son <span id="pSong"></span></h4><div class="spot-player"></div></div>
       <div class="btns" id="pLinks"></div>
       <div class="pnav"><button id="pPrev">← Disque précédent</button><button id="pNext">Disque suivant →</button></div>
     </article>

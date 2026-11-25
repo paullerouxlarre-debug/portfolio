@@ -8,6 +8,10 @@ Portfolio « bac à vinyles » : chaque projet (site, appli, vidéo, démo du la
 - `labo/` : copies des démos **fictives** du QG, pour qu'elles soient accessibles en ligne.
 - Lien direct vers un disque : `…/#disque=<id>` (ex. `#disque=fournil`).
 
-Commandes : ← → / molette / glisser pour feuilleter, Entrée pour écouter, Échap pour ranger. Son de platine (craquements + petite boucle) coupé par défaut.
+Commandes : ← → / molette / glisser pour feuilleter, Entrée pour écouter, Échap pour ranger.
+
+Bande-son : chaque disque a un titre Spotify (champ `song` dans `projects.js`), joué par le lecteur officiel de Spotify (API d'intégration). Morceau entier si on est connecté à Spotify dans le navigateur, extrait de 30 s sinon. Le bouton « Musique auto » coupe le lancement automatique. Aucun fichier audio n'est hébergé ici.
+
+Faces : A sites, B applis, C vidéo, D labo, E IA & agents. Champ `status` facultatif (Abandonné, En pause…) affiché en autocollant.
 
 Hébergement prévu : GitHub Pages (branche `main`, dossier racine).

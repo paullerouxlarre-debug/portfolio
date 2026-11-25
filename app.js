@@ -1,5 +1,6 @@
 (() => {
-  const P = window.PROJECTS, CATS = window.CATS;
+  const CATS = window.CATS, ORDER = Object.keys(CATS);
+  const P = window.PROJECTS.slice().sort((x, y) => ORDER.indexOf(x.cat) - ORDER.indexOf(y.cat));
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
@@ -19,7 +20,7 @@
       <div class="pattern" data-big="${esc(big)}"></div>
       <div class="cat"><span>${esc(CATS[p.cat].label)}</span><span>PR-${esc(p.k)}</span></div>
       <h3>${esc(p.title)}</h3>
-      ${p.links.length && !p.links[0].private ? `<div class="sticker">EN<br>ÉCOUTE<br>LIBRE</div>` : ""}
+      ${p.status ? `<div class="sticker alt">${esc(p.status)}</div>` : p.links.length && !p.links[0].private ? `<div class="sticker">EN<br>ÉCOUTE<br>LIBRE</div>` : ""}
     </div>`;
   }
 
@@ -132,7 +133,8 @@
     player.style.setProperty("--c1", p.c[0]); player.style.setProperty("--c2", p.c[1]);
     $("vlabel").innerHTML = `<span>${esc(p.title)}</span><small>${p.k} · 33⅓</small>`;
     $("pN").textContent = `Face ${CATS[p.cat].face} · ${CATS[p.cat].label} · ${p.k}`;
-    $("pY").textContent = p.year;
+    $("pY").textContent = p.year + (p.status ? " · " + p.status : "");
+    spotify.show(p);
     $("pTitle").textContent = p.title;
     $("pTag").textContent = p.tagline;
     $("pDesc").textContent = p.desc;
@@ -151,6 +153,7 @@
     void player.offsetWidth;
     later(() => player.classList.add("loaded"), 60);
     later(() => { player.classList.add("spinning"); audio.drop(playing); }, 1000);
+    later(() => spotify.play(), 1400);
   }
   function openPlayer(p) {
     if (!p) return;
@@ -163,7 +166,7 @@
   }
   function closePlayer() {
     timers.forEach(clearTimeout);
-    audio.stop();
+    audio.stop(); spotify.pause();
     player.classList.remove("open", "spinning");
     player.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
@@ -172,7 +175,7 @@
   }
   function step(d) {
     const i = P.indexOf(playing), n = P[(i + d + P.length) % P.length];
-    audio.stop(); fill(n); spinUp();
+    audio.stop(); spotify.pause(); fill(n); spinUp();
     const li = list.indexOf(n); if (li >= 0) { cur = li; layout(); }
   }
   $("close").onclick = closePlayer;
@@ -182,9 +185,9 @@
 
   // ── son (coupé par défaut) ──
   const audio = (() => {
-    let ctx, on = localStorage.getItem("bac-son") === "1", nodes = [];
+    let ctx, on = localStorage.getItem("bac-son") !== "0", nodes = [];
     const btn = $("sound");
-    const paint = () => { btn.setAttribute("aria-pressed", on); $("soundTxt").textContent = on ? "Son actif" : "Son coupé"; };
+    const paint = () => { btn.setAttribute("aria-pressed", on); $("soundTxt").textContent = on ? "Musique auto" : "Musique coupée"; };
     paint();
     const ac = () => ctx || (ctx = new (window.AudioContext || window.webkitAudioContext)());
     function noise(sec) {
@@ -202,6 +205,7 @@
       const hp = c.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 1200;
       const cg = c.createGain(); cg.gain.value = 0.35;
       cr.connect(hp).connect(cg).connect(out); cr.start(); nodes.push(cr);
+      if (p.song) { cg.gain.setValueAtTime(0.35, t + 1); cg.gain.linearRampToValueAtTime(0, t + 1.6); cr.stop(t + 1.7); }
       // petite boucle propre à chaque disque
       const seed = [...p.id].reduce((a, ch) => a + ch.charCodeAt(0), 0);
       const root = 196 * Math.pow(2, (seed % 7) / 12);
@@ -215,7 +219,7 @@
         g.gain.setValueAtTime(0, tt); g.gain.linearRampToValueAtTime(0.09, tt + 0.02); g.gain.exponentialRampToValueAtTime(0.001, tt + 0.5);
         o.connect(g).connect(lp); o.start(tt); o.stop(tt + 0.55); n++;
       };
-      const iv = setInterval(note, 300); nodes.push(iv);
+      if (!p.song) { const iv = setInterval(note, 300); nodes.push(iv); }
       // bruit de pose du diamant
       const th = c.createBufferSource(); th.buffer = noise(0.15);
       const tg = c.createGain(); tg.gain.setValueAtTime(0.8, t); tg.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
@@ -223,9 +227,9 @@
     }
     btn.onclick = () => {
       on = !on; localStorage.setItem("bac-son", on ? "1" : "0"); paint();
-      if (on) { ac().resume(); tick(); if (player.classList.contains("spinning")) drop(playing); } else stop();
+      if (on) { ac().resume(); tick(); if (player.classList.contains("spinning")) { drop(playing); spotify.play(); } } else { stop(); spotify.pause(); }
     };
-    return { drop, stop, tick: () => {
+    return { isOn: () => on, drop, stop, tick: () => {
       if (!on) return;
       const c = ac(), o = c.createOscillator(), g = c.createGain(), t = c.currentTime;
       o.type = "square"; o.frequency.value = 1800;
@@ -234,6 +238,40 @@
     } };
   })();
   function tick() { audio.tick(); }
+
+  // ── bande-son Spotify ──
+  const spotify = (() => {
+    let api = null, ctrl = null, current = null, wantPlay = false;
+    const box = $("pSpot");
+    window.onSpotifyIframeApiReady = IFrameAPI => { api = IFrameAPI; if (current) mount(current); };
+    const s = document.createElement("script");
+    s.src = "https://open.spotify.com/embed/iframe-api/v1"; s.async = true; document.head.appendChild(s);
+    function mount(p) {
+      const uri = "spotify:track:" + p.song.id;
+      if (ctrl) { ctrl.loadUri(uri); if (wantPlay) setTimeout(() => ctrl.play(), 300); return; }
+      if (!api) { // repli : lecteur intégré simple
+        box.querySelector(".spot-player").innerHTML = `<iframe title="Lecteur Spotify : ${esc(p.song.title)}" src="https://open.spotify.com/embed/track/${p.song.id}?utm_source=generator" width="100%" height="80" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+        return;
+      }
+      const el = document.createElement("div");
+      box.querySelector(".spot-player").replaceChildren(el);
+      api.createController(el, { uri, width: "100%", height: 80 }, c => {
+        ctrl = c;
+        c.addListener("ready", () => { if (wantPlay) c.play(); });
+      });
+    }
+    return {
+      show(p) {
+        current = p; wantPlay = false;
+        box.hidden = !p.song;
+        if (!p.song) { ctrl?.pause?.(); return; }
+        $("pSong").textContent = `${p.song.title} — ${p.song.artist}`;
+        mount(p);
+      },
+      play() { if (!current?.song || !audio.isOn()) return; wantPlay = true; ctrl?.play?.(); },
+      pause() { wantPlay = false; ctrl?.pause?.(); }
+    };
+  })();
 
   build(0);
 

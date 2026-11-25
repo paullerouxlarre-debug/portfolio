@@ -176,3 +176,11 @@ footer{background:var(--ink);color:rgba(239,230,213,.55);text-align:center;paddi
   .div{padding:8px 12px 12px;font-size:11px}
 }
 @media(max-width:420px){#soundTxt{display:none}.kicker{letter-spacing:.12em}}
+
+/* bande-son */
+.spot{margin-top:18px}
+.spot h4{display:flex;gap:8px;flex-wrap:wrap;align-items:baseline}
+.spot h4 span{font:italic 400 14px var(--serif);letter-spacing:0;text-transform:none;opacity:1;color:var(--rust)}
+.spot-player{min-height:80px;border-radius:12px;overflow:hidden;background:rgba(27,23,20,.06)}
+.spot-player iframe{display:block;border:0;border-radius:12px}
+.art .sticker.alt{background:var(--c3);color:var(--c2);text-transform:uppercase;font-size:clamp(7px,.85vw,10px);padding:4px}
