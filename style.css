@@ -127,8 +127,8 @@ footer{background:var(--ink);color:rgba(239,230,213,.55);text-align:center;paddi
 .vinyl .label small{display:block;font:9px var(--mono);opacity:.75}
 .vinyl .label::after{content:"";position:absolute;width:7%;aspect-ratio:1;border-radius:50%;background:#111;left:46.5%;top:46.5%}
 .player.loaded .vinyl{transform:none;opacity:1}
-.player.spinning .vinyl{animation:spin 1.8s linear infinite}
-.arm{position:absolute;right:9%;top:9%;width:5%;height:66%;transform-origin:50% 7%;transform:rotate(-28deg);transition:transform 1s cubic-bezier(.5,0,.2,1)}
+.player.spinning .vinyl{animation:spin var(--rpm,1.8s) linear infinite}
+.arm{position:absolute;right:9%;top:9%;width:5%;height:66%;transform-origin:50% 7%;transform:rotate(-2deg);transition:transform 1s cubic-bezier(.5,0,.2,1)}
 .arm::before{content:"";position:absolute;left:50%;top:0;width:150%;aspect-ratio:1;border-radius:50%;transform:translateX(-50%);background:radial-gradient(#ddd,#888);box-shadow:0 4px 8px rgba(0,0,0,.5)}
 .arm::after{content:"";position:absolute;left:50%;top:8%;width:18%;height:84%;transform:translateX(-50%);background:linear-gradient(90deg,#aaa,#eee,#999);border-radius:3px}
 .arm i{position:absolute;bottom:0;left:50%;width:70%;height:12%;transform:translateX(-30%) rotate(18deg);background:#222;border-radius:3px;z-index:2}
@@ -215,3 +215,27 @@ footer{background:var(--ink);color:rgba(239,230,213,.55);text-align:center;paddi
 .pnews a{text-decoration:none}.pnews a:hover{text-decoration:underline}
 @keyframes tick{to{transform:translateX(-100%)}}
 @keyframes blink{50%{opacity:.35}}
+
+/* ── commandes de la platine ── */
+.tt-wrap{display:flex;flex-direction:column;gap:14px}
+.vinyl,.arm,.knob{cursor:pointer}
+.platter.scratch{animation:scratch .38s cubic-bezier(.3,0,.3,1)}
+.deck-ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;padding:12px 14px;border-radius:12px;
+  background:linear-gradient(180deg,#2b211a,#1a130e);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 10px 20px -10px rgba(0,0,0,.7)}
+.dk{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:8px;font:700 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#2a2420;
+  background:linear-gradient(180deg,#f2efe9,#c9c3b8);box-shadow:0 3px 0 #7e776c,0 5px 10px rgba(0,0,0,.45);transition:transform .08s,box-shadow .08s}
+.dk:active,.dk[aria-pressed=true]{transform:translateY(2px);box-shadow:0 1px 0 #7e776c,0 2px 4px rgba(0,0,0,.4)}
+.dk b{font-size:15px;line-height:1}
+.rpm{display:flex;gap:4px}
+.rpm .dk{padding:0 12px}
+.rpm .dk[aria-pressed=true]{background:linear-gradient(180deg,#ffd27a,#e9a641)}
+.dk.start{height:52px;padding:0 20px 0 14px;font-size:13px}
+.dk.start i{width:16px;height:16px;border-radius:50%;background:#5a1d10;box-shadow:inset 0 1px 2px rgba(0,0,0,.6)}
+.dk.start[aria-pressed=true] i{background:#ff5a2a;box-shadow:0 0 10px #ff5a2a,inset 0 1px 2px rgba(255,255,255,.4)}
+.player.needs-start .dk.start{animation:pulse 1.1s ease-in-out infinite}
+.player.needs-start .dk.start i{background:#3a9d5d;box-shadow:0 0 10px #3a9d5d}
+.deck-tip{font:11px var(--mono);text-align:center;opacity:.5;margin-top:-4px}
+.led{gap:8px}
+@keyframes scratch{0%{transform:rotate(0)}30%{transform:rotate(-28deg)}60%{transform:rotate(14deg)}100%{transform:rotate(0)}}
+@keyframes pulse{50%{box-shadow:0 3px 0 #7e776c,0 0 0 6px rgba(58,157,93,.45)}}
+@media(max-width:860px){.dk span{display:none}.dk.start span{display:inline}.dk{padding:0 12px}}

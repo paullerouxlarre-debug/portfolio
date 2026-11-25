@@ -105,6 +105,7 @@
     const open = $("player").classList.contains("open");
     if (open) {
       if (e.key === "Escape") closePlayer();
+      if (e.key === " " && !e.target.closest?.("button,a")) { e.preventDefault(); setDeck(!deckOn); }
       if (e.key === "ArrowRight") step(1);
       if (e.key === "ArrowLeft") step(-1);
       return;
@@ -136,7 +137,7 @@
   function fill(p) {
     playing = p;
     player.style.setProperty("--c1", p.c[0]); player.style.setProperty("--c2", p.c[1]);
-    $("vlabel").innerHTML = `<span>${esc(p.title)}</span><small>${p.k} · 33⅓</small>`;
+    $("vlabel").innerHTML = `<span>${esc(p.title)}</span><small>${p.k} · ${rpm === 45 ? "45" : "33⅓"}</small>`;
     $("pN").textContent = `Face ${CATS[p.cat].face} · ${CATS[p.cat].label} · ${p.k}`;
     $("pY").textContent = p.year + (p.status ? " · " + p.status : "");
     spotify.show(p);
@@ -157,14 +158,52 @@
     const j = JOURNAL?.projects?.[p.id];
     $("pY").textContent = p.year + (p.status ? " · " + p.status : "") + (j ? " · màj " + fmt(j.last) : "");
   }
+  // deckOn = bras posé + plateau qui tourne (+ musique si le disque en a une)
+  let deckOn = false, startedAt = 0, rpm = 33;
+  function setDeck(on, { music = true, sound = true } = {}) {
+    deckOn = on;
+    player.classList.toggle("spinning", on);
+    player.classList.remove("needs-start");
+    $("dStart").setAttribute("aria-pressed", on);
+    $("dStart").querySelector("span").textContent = on ? "Stop" : "Start";
+    $("dArm").setAttribute("aria-pressed", on);
+    $("dArm").querySelector("span").textContent = on ? "Lever le bras" : "Poser le bras";
+    if (on) { startedAt = Date.now(); if (sound) audio.drop(playing); if (music) spotify.play(); }
+    else { audio.stop(); if (music) spotify.pause(); }
+  }
+  function blocked() { // musique bloquée par le navigateur : on attend un geste
+    if (deckOn) setDeck(false, { music: false });
+    player.classList.add("needs-start");
+  }
   function spinUp() {
     timers.forEach(clearTimeout); timers = [];
-    player.classList.remove("loaded", "spinning");
+    setDeck(false, { music: false });
+    player.classList.remove("loaded");
     void player.offsetWidth;
     later(() => player.classList.add("loaded"), 60);
-    later(() => { player.classList.add("spinning"); audio.drop(playing); }, 1000);
-    later(() => spotify.play(), 1400);
+    later(() => audio.isOn() ? setDeck(true) : player.classList.add("needs-start"), 1000);
+    later(() => { if (deckOn && playing?.song && spotify.paused()) blocked(); }, 5000);
   }
+  function setRpm(v) {
+    rpm = v;
+    player.style.setProperty("--rpm", v === 45 ? "1.33s" : "1.8s");
+    document.querySelectorAll("[data-rpm]").forEach(b => b.setAttribute("aria-pressed", +b.dataset.rpm === v));
+    $("ledTxt").textContent = v === 45 ? "45 tours" : "33 ⅓ tours";
+    const sm = $("vlabel").querySelector("small"); if (sm && playing) sm.textContent = `${playing.k} · ${v === 45 ? "45" : "33⅓"}`;
+    audio.tick();
+  }
+  function scratch() {
+    const pl = player.querySelector(".platter");
+    pl.classList.remove("scratch"); void pl.offsetWidth; pl.classList.add("scratch");
+    audio.scratch();
+  }
+  $("dStart").onclick = () => setDeck(!deckOn);
+  $("dArm").onclick = () => setDeck(!deckOn, { sound: true });
+  player.querySelector(".arm").addEventListener("click", () => setDeck(!deckOn));
+  player.querySelector(".knob").addEventListener("click", () => setDeck(!deckOn));
+  $("vinyl").addEventListener("click", scratch);
+  document.querySelectorAll("[data-rpm]").forEach(b => b.onclick = () => setRpm(+b.dataset.rpm));
+  $("dEject").onclick = () => closePlayer();
   function openPlayer(p) {
     if (!p) return;
     lastFocus = document.activeElement;
@@ -176,8 +215,8 @@
   }
   function closePlayer() {
     timers.forEach(clearTimeout);
-    audio.stop(); spotify.pause();
-    player.classList.remove("open", "spinning");
+    setDeck(false);
+    player.classList.remove("open", "needs-start");
     player.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
     later(() => player.classList.remove("loaded"), 450);
@@ -185,7 +224,7 @@
   }
   function step(d) {
     const i = P.indexOf(playing), n = P[(i + d + P.length) % P.length];
-    audio.stop(); spotify.pause(); fill(n); spinUp();
+    setDeck(false); fill(n); spinUp();
     const li = list.indexOf(n); if (li >= 0) { cur = li; layout(); }
   }
   $("close").onclick = closePlayer;
@@ -237,9 +276,20 @@
     }
     btn.onclick = () => {
       on = !on; localStorage.setItem("bac-son", on ? "1" : "0"); paint();
-      if (on) { ac().resume(); tick(); if (player.classList.contains("spinning")) { drop(playing); spotify.play(); } } else { stop(); spotify.pause(); }
+      if (on) { ac().resume(); tick(); if (player.classList.contains("open") && !deckOn) setDeck(true); } else if (deckOn) setDeck(false);
     };
-    return { isOn: () => on, drop, stop, tick: () => {
+    function scratch() {
+      if (!on) return;
+      const c = ac(), t = c.currentTime, src = c.createBufferSource();
+      const b = c.createBuffer(1, c.sampleRate * 0.35, c.sampleRate), d = b.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      src.buffer = b;
+      const bp = c.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = 6;
+      bp.frequency.setValueAtTime(300, t); bp.frequency.exponentialRampToValueAtTime(2400, t + 0.12); bp.frequency.exponentialRampToValueAtTime(250, t + 0.3);
+      const g = c.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.5, t + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.33);
+      src.connect(bp).connect(g).connect(c.destination); src.start(t);
+    }
+    return { isOn: () => on, drop, stop, scratch, tick: () => {
       if (!on) return;
       const c = ac(), o = c.createOscillator(), g = c.createGain(), t = c.currentTime;
       o.type = "square"; o.frequency.value = 1800;
@@ -251,23 +301,40 @@
 
   // ── bande-son Spotify ──
   const spotify = (() => {
-    let api = null, ctrl = null, current = null, wantPlay = false;
+    let api = null, ctrl = null, current = null, wantPlay = false, loadedUri = null, pending = false, state = { isPaused: true };
     const box = $("pSpot");
-    window.onSpotifyIframeApiReady = IFrameAPI => { api = IFrameAPI; if (current) mount(current); };
+    window.onSpotifyIframeApiReady = IFrameAPI => { api = IFrameAPI; if (current?.song) mount(current); };
     const s = document.createElement("script");
     s.src = "https://open.spotify.com/embed/iframe-api/v1"; s.async = true; document.head.appendChild(s);
+    function onUpdate(e) {
+      state = e.data || state;
+      if (pending && state.duration > 0) { pending = false; if (wantPlay) ctrl.play(); }
+      // la platine suit la vraie lecture (bouton du lecteur Spotify, fin du morceau…)
+      if (!player.classList.contains("open")) return;
+      if (!state.isPaused && !deckOn) setDeck(true, { music: false, sound: false });
+      else if (state.isPaused && deckOn && !state.isBuffering && state.position > 0 && Date.now() - startedAt > 1500) setDeck(false, { music: false });
+    }
     function mount(p) {
       const uri = "spotify:track:" + p.song.id;
-      if (ctrl) { ctrl.loadUri(uri); if (wantPlay) setTimeout(() => ctrl.play(), 300); return; }
-      if (!api) { // repli : lecteur intégré simple
+      if (ctrl) {
+        if (loadedUri !== uri) {
+          loadedUri = uri; pending = true; state = { isPaused: true };
+          ctrl.loadUri(uri);
+          setTimeout(() => { if (pending) { pending = false; if (wantPlay) ctrl.play(); } }, 1500);
+        }
+        return;
+      }
+      if (!api) { // repli tant que l'API n'est pas chargée : lecteur intégré simple
         box.querySelector(".spot-player").innerHTML = `<iframe title="Lecteur Spotify : ${esc(p.song.title)}" src="https://open.spotify.com/embed/track/${p.song.id}?utm_source=generator" width="100%" height="80" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
         return;
       }
       const el = document.createElement("div");
       box.querySelector(".spot-player").replaceChildren(el);
+      loadedUri = uri; pending = true;
       api.createController(el, { uri, width: "100%", height: 80 }, c => {
         ctrl = c;
-        c.addListener("ready", () => { if (wantPlay) c.play(); });
+        c.addListener("ready", () => { pending = false; if (wantPlay) c.play(); });
+        c.addListener("playback_update", onUpdate);
       });
     }
     return {
@@ -278,8 +345,9 @@
         $("pSong").textContent = `${p.song.title} — ${p.song.artist}`;
         mount(p);
       },
-      play() { if (!current?.song || !audio.isOn()) return; wantPlay = true; ctrl?.play?.(); },
-      pause() { wantPlay = false; ctrl?.pause?.(); }
+      play() { if (!current?.song) return; wantPlay = true; if (ctrl && !pending) ctrl.play(); },
+      pause() { wantPlay = false; ctrl?.pause?.(); },
+      paused: () => !ctrl || state.isPaused
     };
   })();
 
