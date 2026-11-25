@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Atelier Pin Sec</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+
+
+/* Mise en page : un film épinglé plein écran piloté par le scroll (océan + planche en 3D),
+   titres calés en bas à gauche, données en mono, puis une page de sable pour les infos pratiques. */
+:root{
+  color-scheme:dark;
+  --abysse:#140d08;
+  --nuit:#2a1a10;
+  --ecume:#f4ecdc;
+  --brume:rgba(244,236,220,.7);
+  --trait:rgba(244,236,220,.2);
+  --resine:#e0663f;
+  --verre:rgba(24,15,9,.6);
+  --sable:#eadcc4;
+  --encre:#22160d;
+  --encre-douce:rgba(34,22,13,.72);
+  --titre:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --texte:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --gl:max(16px,env(safe-area-inset-left,0px));
+  --gr:max(16px,env(safe-area-inset-right,0px));
+}
+*{box-sizing:border-box}
+html{scroll-behavior:auto}
+body{background:var(--abysse);color:var(--ecume);font-family:var(--texte);font-size:16px;line-height:1.5;overflow-x:hidden}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--resine);outline-offset:3px}
+
+/* ---------- film ---------- */
+.film{position:relative;height:760vh}
+.stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;
+  background:linear-gradient(#1c120b,#3a2617 60%,#140d08)}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block}
+.nogl #gl{display:none}
+.voile{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(to top,rgba(20,13,8,.72) 0%,rgba(20,13,8,0) 46%),linear-gradient(to bottom,rgba(20,13,8,.4) 0%,rgba(20,13,8,0) 22%)}
+.ligne{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--ecume);opacity:0;pointer-events:none;
+  box-shadow:0 0 18px 4px rgba(255,214,170,.85),0 0 90px 30px rgba(243,163,60,.35)}
+
+.barre{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding-block:calc(14px + env(safe-area-inset-top,0px)) 14px;padding-left:var(--gl);padding-right:var(--gr);z-index:5}
+.logo{font-family:var(--titre);font-weight:900;font-size:1.7rem;letter-spacing:.04em;line-height:1;color:var(--ecume);text-decoration:none;display:flex;align-items:baseline;gap:10px}
+.logo small{font-family:var(--mono);font-weight:400;font-size:.68rem;letter-spacing:.08em;color:var(--brume)}
+.barre nav{display:flex;align-items:center;gap:18px;font-family:var(--mono);font-size:.72rem;letter-spacing:.06em}
+.barre nav span{color:var(--brume)}
+.btn-mini{border:1px solid var(--trait);background:transparent;border-radius:999px;padding:8px 14px;cursor:pointer;text-transform:uppercase;letter-spacing:.08em}
+.btn-mini:hover{border-color:var(--ecume)}
+
+.plans{position:absolute;left:0;right:0;bottom:0;padding-left:var(--gl);padding-right:var(--gr);padding-block:0 calc(34px + env(safe-area-inset-bottom,0px));pointer-events:none}
+.plan{position:absolute;left:var(--gl);right:var(--gr);bottom:calc(34px + env(safe-area-inset-bottom,0px));max-width:760px;opacity:0;will-change:opacity,transform}
+.plan:first-child{opacity:1}
+.plan h1,.plan h2{font-family:var(--titre);font-weight:900;font-size:clamp(3.1rem,9.4vw,8.6rem);line-height:.86;letter-spacing:-.005em;text-transform:uppercase;margin:0;text-wrap:balance}
+.plan h1 em,.plan h2 em{font-style:normal;color:var(--resine)}
+.plan p{margin:18px 0 0;max-width:46ch;color:var(--brume);font-size:1.02rem}
+.fiche{margin:16px 0 0;padding:0;list-style:none;font-family:var(--mono);font-size:.74rem;letter-spacing:.03em;color:var(--brume);display:grid;gap:6px;max-width:52ch}
+.fiche b{color:var(--ecume);font-weight:500}
+
+.hud{position:absolute;right:var(--gr);bottom:calc(34px + env(safe-area-inset-bottom,0px));font-family:var(--mono);font-size:.7rem;letter-spacing:.05em;color:var(--brume);
+  display:grid;grid-template-columns:auto auto;gap:4px 14px;text-align:right;pointer-events:none;transition:opacity .3s}
+.hud dt{text-transform:uppercase;text-align:left}
+.hud dd{margin:0;color:var(--ecume);font-variant-numeric:tabular-nums}
+.hud .note{grid-column:1/-1;text-align:right;opacity:.7;font-size:.62rem}
+
+.rail{position:absolute;right:var(--gr);top:50%;transform:translateY(-50%);display:grid;gap:10px;z-index:4}
+.rail button{all:unset;cursor:pointer;display:flex;align-items:center;justify-content:flex-end;gap:10px;font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--brume)}
+.rail button span{opacity:0;transition:opacity .2s}
+.rail button i{display:block;width:18px;height:2px;background:var(--trait);transition:width .25s,background .25s}
+.rail button:hover span,.rail button:focus-visible span,.rail button.on span{opacity:1}
+.rail button.on i{width:34px;background:var(--resine)}
+.rail button:focus-visible{outline:2px solid var(--resine);outline-offset:4px}
+
+.amorce{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--brume);pointer-events:none}
+
+/* ---------- panneau de réservation ---------- */
+.resa{position:absolute;right:var(--gr);top:50%;width:min(390px,calc(100% - var(--gl) - var(--gr)));transform:translate(40px,-50%);opacity:0;visibility:hidden;
+  background:var(--verre);-webkit-backdrop-filter:blur(18px) saturate(1.2);backdrop-filter:blur(18px) saturate(1.2);border:1px solid var(--trait);border-radius:6px;
+  padding:22px;display:grid;gap:16px;z-index:6;transition:opacity .45s,transform .6s cubic-bezier(.2,.8,.2,1),visibility 0s .45s;max-height:calc(100svh - 110px);overflow:auto}
+.resa.on{opacity:1;visibility:visible;transform:translate(0,-50%);transition:opacity .45s,transform .6s cubic-bezier(.2,.8,.2,1)}
+.resa h3{margin:0;font-family:var(--mono);font-weight:500;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--brume)}
+.champ{display:grid;gap:7px;min-width:0}
+.champ>label,.champ>span{font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--brume)}
+.choix{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.choix label{position:relative;display:block;cursor:pointer}
+.choix input{position:absolute;opacity:0;inset:0}
+.choix b{display:block;border:1px solid var(--trait);border-radius:4px;padding:9px 6px;text-align:center;font-weight:500;font-size:.84rem;line-height:1.2}
+.choix small{display:block;font-family:var(--mono);font-size:.62rem;color:var(--brume);margin-top:2px}
+.choix input:checked+b{background:var(--ecume);color:var(--encre);border-color:var(--ecume)}
+.choix input:checked+b small{color:var(--encre-douce)}
+.choix input:focus-visible+b{outline:2px solid var(--resine);outline-offset:2px}
+.resa input[type=date]{background:transparent;border:1px solid var(--trait);border-radius:4px;padding:9px 10px;width:100%;color-scheme:dark}
+.coches{display:grid;gap:8px}
+.coches label{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:.9rem;cursor:pointer}
+.coches label span{display:flex;gap:9px;align-items:center}
+.coches input{accent-color:var(--resine);width:17px;height:17px}
+.coches em{font-style:normal;font-family:var(--mono);font-size:.72rem;color:var(--brume)}
+.total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--trait);padding-top:14px}
+.total span{font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--brume)}
+.total output{font-family:var(--titre);font-weight:900;font-size:2.4rem;line-height:1;font-variant-numeric:tabular-nums}
+.go{border:0;border-radius:4px;background:var(--resine);color:var(--encre);font-family:var(--titre);font-weight:900;font-size:1.35rem;letter-spacing:.04em;text-transform:uppercase;padding:14px;cursor:pointer;transition:background .2s,transform .15s}
+.go:hover{background:#ef7d57}
+.go:active{transform:scale(.985)}
+.go.fait{background:var(--ecume)}
+.mention{margin:0;font-family:var(--mono);font-size:.62rem;color:var(--brume);letter-spacing:.03em}
+
+/* ---------- après le film ---------- */
+.terre{background:var(--sable);color:var(--encre)}
+.terre .in{max-width:1180px;margin:0 auto;padding-left:var(--gl);padding-right:var(--gr);padding-block:clamp(56px,9vw,120px)}
+.terre h2{font-family:var(--titre);font-weight:900;text-transform:uppercase;font-size:clamp(2.4rem,6vw,5rem);line-height:.9;margin:0 0 12px;text-wrap:balance}
+.terre .chapo{max-width:60ch;color:var(--encre-douce);margin:0 0 clamp(28px,4vw,52px)}
+.spots{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0;border-top:2px solid var(--encre)}
+.spot{padding:20px 20px 26px 0;border-bottom:1px solid rgba(12,32,41,.25);min-width:0}
+.spot h3{font-family:var(--titre);font-weight:700;font-size:1.9rem;text-transform:uppercase;line-height:1;margin:0 0 6px}
+.spot .pour{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--encre-douce);margin:0 0 10px}
+.spot p{margin:0;font-size:.95rem;max-width:34ch}
+.pratique{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:28px;margin-top:clamp(40px,6vw,80px)}
+.pratique h3{font-family:var(--mono);font-weight:500;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--encre-douce);margin:0 0 8px}
+.pratique p{margin:0;font-size:1.02rem}
+.pied{background:var(--abysse);color:var(--brume);font-family:var(--mono);font-size:.68rem;letter-spacing:.04em}
+.pied .in{max-width:1180px;margin:0 auto;padding-left:var(--gl);padding-right:var(--gr);padding-block:26px calc(26px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;gap:8px 28px;justify-content:space-between}
+
+@media (max-width:760px){
+  .rail,.barre nav span{display:none}
+  .hud{position:absolute;top:calc(64px + env(safe-area-inset-top,0px));bottom:auto;left:var(--gl);right:auto;text-align:left;grid-template-columns:auto auto;font-size:.62rem}
+  .hud dd{text-align:left}.hud .note{text-align:left}
+  .plan p{font-size:.95rem}
+  .plan.haut-m{display:none}
+  .voile{background:linear-gradient(to top,rgba(20,13,8,.86) 0%,rgba(20,13,8,.5) 34%,rgba(20,13,8,0) 62%),linear-gradient(to bottom,rgba(20,13,8,.5) 0%,rgba(20,13,8,0) 24%)}
+  .resa{top:auto;bottom:calc(12px + env(safe-area-inset-bottom,0px));transform:translateY(30px);padding:16px;gap:12px;max-height:calc(100svh - 215px)}
+  .resa.on{transform:none}
+  .amorce{display:none}
+}
+@media (prefers-reduced-motion:reduce){.resa,.resa.on{transition:none}}
+
+/* propre à l'atelier */
+.choix.deux{grid-template-columns:repeat(2,1fr)}
+.etapes{list-style:none;margin:clamp(40px,6vw,80px) 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:22px;counter-reset:e}
+.etapes li{counter-increment:e;border-top:2px solid var(--encre);padding-top:12px;min-width:0}
+.etapes li::before{content:counter(e,decimal-leading-zero);font-family:var(--mono);font-size:.7rem;color:var(--encre-douce);display:block;margin-bottom:6px}
+.etapes b{display:block;font-family:var(--titre);font-weight:700;font-size:1.5rem;text-transform:uppercase;line-height:1}
+.etapes span{display:block;font-size:.92rem;margin-top:6px;color:var(--encre-douce)}
+</style>
+
+</head>
+<body>
+<section class="film" id="film" aria-label="Une journée à l'atelier, de la planche brute à l'assemblage huilé">
+  <div class="stage" id="stage">
+    <canvas id="gl" aria-hidden="true"></canvas>
+    <div class="voile"></div>
+    <div class="ligne" id="ligne"></div>
+
+    <header class="barre">
+      <a class="logo" href="#film">PIN SEC <small>MENUISERIE · ONDRES</small></a>
+      <nav>
+        <span>43°34′ N · 1°27′ O</span>
+        <button class="btn-mini" type="button" data-vers="5">Devis</button>
+      </nav>
+    </header>
+
+    <dl class="hud" id="hud" aria-label="Fiche d'atelier d'exemple">
+      <dt>Heure</dt><dd id="h-heure">06:50</dd>
+      <dt>Bois</dt><dd id="h-bois">Pin maritime</dd>
+      <dt>Humidité</dt><dd id="h-hum">10 %</dd>
+      <dt>Étape</dt><dd id="h-etape">Débit</dd>
+      <div class="note">valeurs d'exemple</div>
+    </dl>
+
+    <div class="plans">
+      <div class="plan" data-de="-1" data-a=".085">
+        <h1>6 h 50.<br>Deux planches brutes.</h1>
+        <p>Du pin maritime des Landes, séché à 10 %. Fais défiler : on les assemble devant toi, sans une vis.</p>
+      </div>
+      <div class="plan" data-de=".105" data-a=".25">
+        <h2>7 h 30.<br><em>Tracé, scié.</em></h2>
+        <p>Le trusquin règle la profondeur, la fausse équerre garde la pente. On scie à côté du trait, dans le déchet, puis on pare au ciseau.</p>
+      </div>
+      <div class="plan" data-de=".28" data-a=".47">
+        <h2>Regarde<br>de près.</h2>
+        <ul class="fiche">
+          <li><b>Pente 1:6 · 9,5°</b> — pour un bois tendre comme le pin</li>
+          <li><b>Pente 1:8 · 7°</b> — pour le chêne, le bout de la queue reste solide</li>
+          <li><b>Fil du bois</b> — la queue suit les fibres ; à contre-fil, le bois se déchire</li>
+          <li><b>Scie à dos</b> — un trait fin, peu de matière perdue, un joint serré</li>
+        </ul>
+      </div>
+      <div class="plan" data-de=".51" data-a=".665">
+        <h2>Emboîté.<br><em>Sans une vis.</em></h2>
+        <p>La queue s'élargit vers son bout : une fois glissée dans son logement, elle ne ressort plus en tirant. Serrage gras, au maillet, sur une cale.</p>
+      </div>
+      <div class="plan" data-de=".70" data-a=".865">
+        <h2>Huile de lin.<br><em>Lumière du soir.</em></h2>
+        <p>Ponçage au grain 120 puis 180, une couche mince d'huile. Le joint ne se devine plus qu'au toucher.</p>
+      </div>
+      <div class="plan haut-m" data-de=".895" data-a="2">
+        <h2>Demande<br>ta visite.</h2>
+        <p>On vient mesurer chez toi : les murs ne sont jamais d'équerre.</p>
+      </div>
+    </div>
+
+    <form class="resa" id="resa" novalidate aria-label="Demander une visite">
+      <h3>Demande de visite · Atelier Pin Sec</h3>
+      <div class="champ"><span>Meuble</span>
+        <div class="choix">
+          <label><input type="radio" name="meuble" id="mb-table" value="1400" checked><b>Table<small>dès 1 400 €</small></b></label>
+          <label><input type="radio" name="meuble" id="mb-placard" value="2200"><b>Placard<small>dès 2 200 €</small></b></label>
+          <label><input type="radio" name="meuble" id="mb-volets" value="900"><b>Volets<small>la paire · 900 €</small></b></label>
+        </div>
+      </div>
+      <div class="champ"><span>Essence</span>
+        <div class="choix deux">
+          <label><input type="radio" name="bois" id="es-pin" value="1" checked><b>Pin maritime<small>tendre · local</small></b></label>
+          <label><input type="radio" name="bois" id="es-chene" value="1.5"><b>Chêne<small>dur · × 1,5</small></b></label>
+        </div>
+      </div>
+      <div class="champ"><label for="jour">Jour de visite</label><input type="date" id="jour" name="jour"></div>
+      <div class="coches">
+        <label><span><input type="checkbox" id="op-pose" value="250"> Pose et réglage sur place</span><em>+ 250 €</em></label>
+        <label><span><input type="checkbox" id="op-liv" value="80"> Livraison</span><em>+ 80 €</em></label>
+      </div>
+      <div class="total"><span>Estimation</span><output id="total" for="mb-table mb-placard mb-volets es-pin es-chene op-pose op-liv">1 400 €</output></div>
+      <button class="go" id="go" type="submit">Demander une visite</button>
+      <p class="mention" id="mention">Huile de lin comprise. Prix d'exemple, devis après mesures.</p>
+    </form>
+
+    <nav class="rail" id="rail" aria-label="Chapitres du film">
+      <button type="button" data-vers="0"><span>Brut</span><i></i></button>
+      <button type="button" data-vers="1"><span>Tracé</span><i></i></button>
+      <button type="button" data-vers="2"><span>De près</span><i></i></button>
+      <button type="button" data-vers="3"><span>Emboîté</span><i></i></button>
+      <button type="button" data-vers="4"><span>Huilé</span><i></i></button>
+      <button type="button" data-vers="5"><span>Devis</span><i></i></button>
+    </nav>
+    <div class="amorce" id="amorce">Fais défiler</div>
+  </div>
+</section>
+
+<section class="terre" id="atelier">
+  <div class="in">
+    <h2>Ce que je fabrique, sur mesure</h2>
+    <p class="chapo">En pin maritime des Landes ou en chêne, assemblé à l'ancienne et fini à l'huile de lin.</p>
+    <div class="spots">
+      <article class="spot"><h3>Tables et bancs</h3><p class="pour">Tenon et mortaise · huilé</p><p>Pieds assemblés sans quincaillerie, plateau en chêne ou en pin.</p></article>
+      <article class="spot"><h3>Placards</h3><p class="pour">Aux cotes de la pièce</p><p>Dans les recoins où le meuble du commerce ne rentre pas.</p></article>
+      <article class="spot"><h3>Volets et portes</h3><p class="pour">Pin des Landes · air salé</p><p>Posés et réglés sur place, avec une finition qui tient près de l'océan.</p></article>
+    </div>
+    <ol class="etapes" aria-label="Comment se passe une commande">
+      <li><b>Visite</b><span>Relevé sur place.</span></li>
+      <li><b>Devis</b><span>Plan, essence, finition.</span></li>
+      <li><b>Bois</b><span>Planches triées, vérifiées sèches.</span></li>
+      <li><b>Atelier</b><span>Tracé, coupe, assemblage, huile.</span></li>
+      <li><b>Pose</b><span>Livraison et réglage chez toi.</span></li>
+    </ol>
+    <div class="pratique">
+      <div><h3>L'atelier</h3><p>Ondres (40), adresse d'exemple.</p></div>
+      <div><h3>Horaires</h3><p>Du lundi au vendredi, 8 h à 12 h et 14 h à 18 h (exemple).</p></div>
+      <div><h3>Téléphone</h3><p>05 00 00 00 00 (numéro fictif).</p></div>
+    </div>
+  </div>
+</section>
+<footer class="pied"><div class="in"><span>ATELIER PIN SEC · ONDRES (40)</span><span>Démo : atelier, prix et horaires fictifs. Repères techniques à faire relire par un menuisier.</span></div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<script>
+(function(){
+  'use strict';
+  var $=function(id){return document.getElementById(id)};
+  var film=$('film'), stage=$('stage'), canvas=$('gl'), ligne=$('ligne'), resa=$('resa'), amorce=$('amorce');
+  var plans=[].slice.call(document.querySelectorAll('.plan')), railB=[].slice.call(document.querySelectorAll('#rail button'));
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var clamp=function(x,a,b){return Math.max(a,Math.min(b,x))};
+  var ss=function(a,b,x){var t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)};
+  var lerp=function(a,b,t){return a+(b-a)*t};
+
+  /* ---------- moteur de scroll (recette Gouf) ---------- */
+  var pCible=0, p=0;
+  function lire(){ var r=film.getBoundingClientRect(), h=film.offsetHeight-window.innerHeight; pCible=h>0?clamp(-r.top/h,0,1):0; }
+  var ANCRES=[0,.2,.37,.6,.79,.97];
+  function aller(i){ var h=film.offsetHeight-window.innerHeight, y=film.getBoundingClientRect().top+window.pageYOffset+h*ANCRES[i];
+    window.scrollTo({top:y,behavior:reduce?'auto':'smooth'}); }
+  [].forEach.call(document.querySelectorAll('[data-vers]'),function(b){ b.addEventListener('click',function(){aller(+b.getAttribute('data-vers'))}); });
+
+  var HUD=[
+    ['06:50','Pin maritime','10 %','Débit'],
+    ['07:30','Pin maritime','10 %','Tracé, sciage'],
+    ['08:15','Pin maritime','10 %','Parage au ciseau'],
+    ['11:40','Pin maritime','10 %','Emboîtage à blanc'],
+    ['18:30','Pin maritime','10 %','Huile de lin'],
+    ['18:45','—','—','Devis']
+  ];
+  var hudEl=[$('h-heure'),$('h-bois'),$('h-hum'),$('h-etape')], chap=-1;
+  function chapitre(x){ return x<.1?0 : x<.27?1 : x<.49?2 : x<.68?3 : x<.88?4 : 5; }
+  function interface_(x){
+    for(var i=0;i<plans.length;i++){
+      var e=plans[i], a=+e.getAttribute('data-de'), b=+e.getAttribute('data-a');
+      var o=ss(a,a+.028,x)*(1-ss(b-.028,b,x));
+      e.style.opacity=o.toFixed(3);
+      e.style.transform='translate3d(0,'+((1-ss(a,a+.045,x))*46-ss(b-.03,b,x)*30).toFixed(1)+'px,0)';
+      e.style.visibility=o<.01?'hidden':'visible';
+    }
+    var w=clamp((x-.07)/.13,0,1);
+    ligne.style.left=(w*100)+'%'; ligne.style.opacity=(w>0&&w<1)?1:0;
+    var c=chapitre(x);
+    if(c!==chap){ chap=c; for(var k=0;k<4;k++) hudEl[k].textContent=HUD[c][k];
+      railB.forEach(function(b,j){ b.classList.toggle('on',j===c); if(j===c) b.setAttribute('aria-current','step'); else b.removeAttribute('aria-current'); }); }
+    resa.classList.toggle('on',x>.9);
+    $('hud').style.opacity=x>.88?0:1;
+    amorce.style.opacity=1-ss(.005,.03,x);
+  }
+
+  /* ---------- demande de visite (démo locale) ---------- */
+  var total=$('total'), go=$('go'), mention=$('mention'), jour=$('jour'), TXT=mention.textContent;
+  try{ var d=new Date(Date.now()+3*864e5); jour.value=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }catch(e){}
+  function calcul(){
+    var m=+resa.querySelector('input[name=meuble]:checked').value, b=+resa.querySelector('input[name=bois]:checked').value;
+    var t=Math.round(m*b/10)*10+($('op-pose').checked?250:0)+($('op-liv').checked?80:0);
+    total.textContent=t.toLocaleString('fr-FR')+' €';
+    if(go.classList.contains('fait')){ go.classList.remove('fait'); go.textContent='Demander une visite'; mention.textContent=TXT; }
+  }
+  resa.addEventListener('change',calcul);
+  resa.addEventListener('submit',function(e){ e.preventDefault();
+    go.classList.add('fait'); go.textContent='C\'est noté. On t\'appelle'; mention.textContent='Démo : rien n\'a été envoyé.'; });
+  calcul();
+
+  /* ---------- 3D ---------- */
+  var renderer, T=window.THREE;
+  try{ if(!T) throw 0; renderer=new T.WebGLRenderer({canvas:canvas,antialias:true,powerPreference:'high-performance'}); }
+  catch(err){ document.body.classList.add('nogl'); lire(); interface_(pCible);
+    window.addEventListener('scroll',function(){lire();interface_(pCible)},{passive:true}); return; }
+  renderer.outputEncoding=T.sRGBEncoding;
+
+  /* lumière de l'atelier : nuit (bleue, froide), jour (fenêtre à gauche), soir (soleil rasant à droite) */
+  var E={
+    nuit:{mur:[.05,.04,.035],haut:[.015,.016,.024],fen:[.3,.4,.65],dir:[-.62,.3,-.72],pow:.35,dust:0,hemi:[.35,.4,.55],hemiI:.3,key:[.55,.65,1],keyI:.35},
+    jour:{mur:[.3,.22,.15],haut:[.1,.08,.065],fen:[.9,.95,1],dir:[-.62,.3,-.72],pow:1,dust:.55,hemi:[1,.93,.84],hemiI:.65,key:[1,.96,.9],keyI:1.15},
+    soir:{mur:[.34,.18,.09],haut:[.1,.055,.035],fen:[1,.6,.28],dir:[.7,.16,-.7],pow:1.35,dust:1,hemi:[1,.74,.5],hemiI:.45,key:[1,.62,.3],keyI:1.7}
+  };
+  function mixE(a,b,t){ var o={},k; for(k in a){ o[k]=a[k].length?[lerp(a[k][0],b[k][0],t),lerp(a[k][1],b[k][1],t),lerp(a[k][2],b[k][2],t)]:lerp(a[k],b[k],t); } return o; }
+  function etatA(x){ return x<.64?E.jour:mixE(E.jour,E.soir,ss(.64,.8,x)); }
+
+  var V3=function(){return new T.Vector3()};
+  var U={uMur:{value:V3()},uHaut:{value:V3()},uFen:{value:V3()},uDir:{value:V3()},uPow:{value:0},uDust:{value:0},uTime:{value:0}};
+  var scene=new T.Scene(), camera=new T.PerspectiveCamera(35,1,.1,600);
+
+  /* le mur de l'atelier et sa fenêtre à croisillons, calculés dans un shader */
+  var dome=new T.Mesh(new T.SphereGeometry(300,32,20),new T.ShaderMaterial({uniforms:U,side:T.BackSide,depthWrite:false,
+    vertexShader:'varying vec3 vD; void main(){ vD=position; gl_Position=projectionMatrix*viewMatrix*vec4(position+cameraPosition,1.); }',
+    fragmentShader:'uniform vec3 uMur,uHaut,uFen,uDir; uniform float uPow; varying vec3 vD;'+
+      'void main(){ vec3 d=normalize(vD), w=normalize(uDir); float h=d.y*.5+.5; vec3 c=mix(uMur,uHaut,smoothstep(.5,.95,h));'+
+      ' vec3 u=normalize(cross(w,vec3(0.,1.,0.))), v=cross(u,w); float s=dot(d,w), px=dot(d,u), py=dot(d,v);'+
+      ' float vitre=step(.0,s)*step(abs(px),.17)*step(abs(py),.24)*(1.-step(abs(px),.009))*(1.-step(abs(py),.009));'+
+      ' c+=uFen*(vitre*1.5+pow(max(s,0.),7.)*.4)*uPow; c*=mix(.5,1.,smoothstep(.38,.5,h)); gl_FragColor=vec4(c,1.); }'}));
+  dome.frustumCulled=false; dome.renderOrder=-1; scene.add(dome);
+
+  function bois(base,fonce,seed,rx,ry){
+    var c=document.createElement('canvas'); c.width=512; c.height=256; var x=c.getContext('2d');
+    x.fillStyle=base; x.fillRect(0,0,512,256);
+    for(var y=0,i=0;y<256;y+=5,i++){ x.strokeStyle=fonce; x.globalAlpha=.1+.12*((Math.sin(i*1.7+seed)+1)/2); x.lineWidth=1+((i*7+seed*3)%3)*.6;
+      x.beginPath(); x.moveTo(0,y); for(var px=0;px<=512;px+=32) x.lineTo(px,y+Math.sin(px/90+i*.8+seed)*4); x.stroke(); }
+    x.globalAlpha=1; var t=new T.CanvasTexture(c); t.wrapS=t.wrapT=T.RepeatWrapping; t.repeat.set(rx,ry); t.anisotropy=8; t.encoding=T.sRGBEncoding; return t;
+  }
+  /* établi */
+  var etabli=new T.Mesh(new T.BoxGeometry(16,.6,7),new T.MeshStandardMaterial({map:bois('#6e4a2b','#2e1a0b',5,1.4,1),roughness:.8}));
+  etabli.position.y=-.3; scene.add(etabli);
+
+  /* l'assemblage à queue d'aronde (profils repris de la v2) */
+  var D=.45;
+  function forme(pts){ var sh=new T.Shape(); pts.forEach(function(q,i){ var x=(q[0]-400)/100, y=(200-q[1])/100; if(i) sh.lineTo(x,y); else sh.moveTo(x,y); }); sh.closePath(); return sh; }
+  function ext(pts){ var g=new T.ExtrudeGeometry(forme(pts),{depth:D,bevelEnabled:true,bevelThickness:.012,bevelSize:.012,bevelOffset:-.012,bevelSegments:1,curveSegments:1});
+    g.rotateX(-Math.PI/2); return g; }
+  var PA=[[40,130],[380,130],[380,175],[480,158],[480,242],[380,225],[380,270],[40,270]];
+  var PB=[[380,130],[760,130],[760,270],[380,270],[380,225],[480,242],[480,158],[380,175]];
+  var BA=[[40,130],[480,130],[480,270],[40,270]], BB=[[380,130],[760,130],[760,270],[380,270]];
+  var tA=bois('#dcb57c','#8a5a28',0,.28,.5), tB=bois('#c08a52','#5a3a18',3,.28,.5);
+  var mBrut=[new T.MeshStandardMaterial({map:tA,roughness:1,color:0xd8cfc4}),new T.MeshStandardMaterial({map:tB,roughness:1,color:0xd8cfc4})];
+  var mCoupe=[new T.MeshStandardMaterial({map:tA,roughness:.85}),new T.MeshStandardMaterial({map:tB,roughness:.85})];
+  var gA=new T.Group(), gB=new T.Group(), pose=new T.Group(); pose.add(gA); pose.add(gB); scene.add(pose);
+  var brutA=new T.Mesh(ext(BA),mBrut[0]), brutB=new T.Mesh(ext(BB),mBrut[1]), cutA=new T.Mesh(ext(PA),mCoupe[0]), cutB=new T.Mesh(ext(PB),mCoupe[1]);
+  gA.add(brutA); gA.add(cutA); gB.add(brutB); gB.add(cutB);
+  var wmat=new T.MeshBasicMaterial({color:0xf4ecdc,wireframe:true,transparent:true,opacity:0,depthWrite:false});
+  var fil=new T.Group(); [cutA,cutB].forEach(function(m){ var f=new T.Mesh(m.geometry,wmat); f.scale.setScalar(1.003); (m===cutA?gA:gB).add(f); fil.add(f); });
+  /* tracés au crayon rouge sur la face */
+  var traits=[], NT=0, tmat=new T.LineBasicMaterial({color:0xe0663f,transparent:true});
+  [[PA,gA],[PB,gB]].forEach(function(pr){ var pts=pr[0].concat([pr[0][0]]); NT=pts.length;
+    var l=new T.Line(new T.BufferGeometry().setFromPoints(pts.map(function(q){return new T.Vector3((q[0]-400)/100,D+.012,-(200-q[1])/100)})),tmat); pr[1].add(l); traits.push(l); });
+
+  /* poussière dans le rayon de la fenêtre */
+  var NP=420, pp=new Float32Array(NP*3), ps=new Float32Array(NP);
+  for(var i=0;i<NP;i++){ var t=Math.random(), r=.25+t*1.4; pp[i*3]=(Math.random()-.5)*r*2; pp[i*3+1]=t; pp[i*3+2]=(Math.random()-.5)*r*2; ps[i]=Math.random(); }
+  var pg=new T.BufferGeometry(); pg.setAttribute('position',new T.BufferAttribute(pp,3)); pg.setAttribute('aS',new T.BufferAttribute(ps,1));
+  var poussiere=new T.Points(pg,new T.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,blending:T.AdditiveBlending,
+    vertexShader:'uniform vec3 uDir; uniform float uTime; attribute float aS; varying float vA;'+
+      'void main(){ vec3 w=normalize(uDir); vec3 q=w*position.y*9.+vec3(position.x,0.,position.z);'+
+      ' q+=vec3(sin(uTime*.25+aS*40.)*.25,sin(uTime*.18+aS*25.)*.3+.6,cos(uTime*.2+aS*30.)*.25);'+
+      ' vec4 mv=modelViewMatrix*vec4(q,1.); gl_Position=projectionMatrix*mv; gl_PointSize=min((1.5+aS*2.5)*(30./-mv.z),5.); vA=.35+.65*fract(aS*7.3); }',
+    fragmentShader:'uniform vec3 uFen; uniform float uDust; varying float vA; void main(){ float r=length(gl_PointCoord-.5); if(r>.5) discard;'+
+      ' gl_FragColor=vec4(uFen*(1.-r*2.)*vA*uDust*.9,1.); }'}));
+  poussiere.frustumCulled=false; scene.add(poussiere);
+
+  var hemi=new T.HemisphereLight(0xffffff,0x2a1a10,1); scene.add(hemi);
+  var key=new T.DirectionalLight(0xffffff,1); scene.add(key);
+  var fill=new T.DirectionalLight(0xffd8b0,.18); fill.position.set(4,3,6); scene.add(fill);
+  function appliquer(s){
+    U.uMur.value.fromArray(s.mur); U.uHaut.value.fromArray(s.haut); U.uFen.value.fromArray(s.fen); U.uDir.value.fromArray(s.dir); U.uPow.value=s.pow; U.uDust.value=s.dust;
+    hemi.color.setRGB(s.hemi[0],s.hemi[1],s.hemi[2]); hemi.intensity=s.hemiI;
+    key.color.setRGB(s.key[0],s.key[1],s.key[2]); key.intensity=s.keyI; key.position.set(s.dir[0]*10,Math.max(s.dir[1]*10,3),s.dir[2]*10);
+  }
+  function coupe(on){ brutA.visible=brutB.visible=!on; cutA.visible=cutB.visible=on; }
+
+  /* images clés : p | caméra | cible | position de l'assemblage | lacet | écart | levée | filaire */
+  var K=[
+    {p:0,   c:[1.4,5.4,8.6], t:[.6,0,0],    b:[1.4,0,0], y:-.32,sep:.6,lev:0,  w:0},
+    {p:.22, c:[.9,4.8,7.8],  t:[.8,0,0],   b:[1.4,0,0], y:-.18,sep:.6,lev:0,  w:0},
+    {p:.33, c:[-.2,2.2,2.9], t:[1.1,.2,0],  b:[1.4,0,0], y:-.1, sep:.6,lev:0,  w:1},
+    {p:.45, c:[2.6,1.9,2.6], t:[1.3,.2,0],  b:[1.4,0,0], y:.25, sep:.6,lev:0,  w:.6},
+    {p:.53, c:[1.6,4.4,7],   t:[1.4,.3,0],  b:[1.4,0,0], y:-.15,sep:0, lev:1.2,w:0},
+    {p:.585,c:[1.4,4.2,6.6], t:[1.4,0,0],   b:[1.4,0,0], y:-.15,sep:0, lev:0,  w:0},
+    {p:.68, c:[.6,3.6,6.4],  t:[.6,0,0],   b:[1.4,0,0], y:.1,  sep:0, lev:0,  w:0},
+    {p:.80, c:[-.4,2.6,5.6], t:[.2,.1,0],  b:[1.4,0,0], y:.3,  sep:0, lev:0,  w:0},
+    {p:.90, c:[-1.6,3.2,6.8],t:[.4,.1,0],   b:[0,0,0],   y:.4,  sep:0, lev:0,  w:0},
+    {p:1,   c:[-1.8,3.3,7],  t:[.4,.1,0],   b:[0,0,0],   y:.45, sep:0, lev:0,  w:0}
+  ];
+  var portrait=false, W=1, Hh=1, souris={x:0,y:0,sx:0,sy:0}, tgt=new T.Vector3();
+  function taille(){
+    W=stage.clientWidth; Hh=stage.clientHeight; portrait=W/Hh<.85;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,W<700?2:1.6)); renderer.setSize(W,Hh,false);
+    pose.scale.setScalar(portrait?.74:1); camera.aspect=W/Hh; camera.fov=portrait?50:35; camera.updateProjectionMatrix();
+  }
+  function scene3d(x){
+    var i=0; while(i<K.length-2 && x>K[i+1].p) i++;
+    var A=K[i], B=K[i+1], u=ss(A.p,B.p,x), f=function(k,j){return lerp(A[k][j],B[k][j],u)};
+    var bx=portrait?0:f('b',0), dx=portrait?-f('b',0):0, dy=portrait?-1.6:0;
+    souris.sx+=(souris.x-souris.sx)*.05; souris.sy+=(souris.y-souris.sy)*.05;
+    camera.position.set(f('c',0)+dx+souris.sx*.3,f('c',1)-souris.sy*.15,f('c',2));
+    tgt.set(f('t',0)+dx,f('t',1)+dy,f('t',2)); camera.lookAt(tgt);
+    pose.position.set(bx,0,0); pose.rotation.y=lerp(A.y,B.y,u);
+    var sep=lerp(A.sep,B.sep,u); gA.position.set(-sep,0,0); gB.position.x=sep;
+    cutA.position.y=lerp(A.lev,B.lev,u); fil.children[0].position.y=cutA.position.y;
+    var w=lerp(A.w,B.w,u); wmat.opacity=w*.3; fil.visible=w>.01;
+    var tr=ss(.09,.22,x)*(1-ss(.27,.33,x)); traits.forEach(function(l){ l.geometry.setDrawRange(0,Math.round(ss(.09,.22,x)*NT)); l.visible=tr>.01; }); tmat.opacity=tr;
+    var huile=ss(.7,.82,x); mCoupe.forEach(function(m){ m.roughness=.85-.5*huile; m.color.setRGB(1,1-.12*huile,1-.3*huile); });
+  }
+  function rendu(x,t){
+    U.uTime.value=t*(reduce?.25:1);
+    var w=clamp((x-.07)/.13,0,1);
+    scene3d(x);
+    if(w<=0){ appliquer(E.nuit); coupe(false); renderer.setScissorTest(false); renderer.render(scene,camera); }
+    else if(w>=1){ appliquer(etatA(x)); coupe(true); renderer.setScissorTest(false); renderer.render(scene,camera); }
+    else{ var xl=Math.round(W*w); renderer.setScissorTest(true);
+      renderer.setScissor(0,0,xl,Hh); appliquer(E.jour); coupe(true); renderer.render(scene,camera);
+      renderer.setScissor(xl,0,W-xl,Hh); appliquer(E.nuit); coupe(false); renderer.render(scene,camera); }
+  }
+
+  var raf=0, visible=true;
+  function boucle(now){ raf=requestAnimationFrame(boucle);
+    p+=(pCible-p)*(reduce?1:.085); if(Math.abs(pCible-p)<.00005) p=pCible;
+    interface_(p); rendu(p,now/1000); }
+  function marche(){ if(!raf&&visible&&!document.hidden) raf=requestAnimationFrame(boucle); }
+  function arret(){ if(raf){ cancelAnimationFrame(raf); raf=0; } }
+  window.addEventListener('scroll',lire,{passive:true});
+  window.addEventListener('resize',function(){ taille(); lire(); });
+  window.addEventListener('pointermove',function(e){ if(e.pointerType==='mouse'){ souris.x=e.clientX/W*2-1; souris.y=e.clientY/Hh*2-1; } },{passive:true});
+  document.addEventListener('visibilitychange',function(){ document.hidden?arret():marche(); });
+  if('IntersectionObserver' in window){ new IntersectionObserver(function(es){ visible=es[0].isIntersecting; visible?marche():arret(); }).observe(film); }
+  canvas.addEventListener('webglcontextlost',function(e){ e.preventDefault(); arret(); document.body.classList.add('nogl'); });
+  taille(); lire(); p=pCible; interface_(p); rendu(p,0); marche();
+  window.__film={aller:function(x){ var h=film.offsetHeight-window.innerHeight; window.scrollTo(0,film.offsetTop+h*x); lire(); p=pCible; }};
+})();
+</script>
+</body>
+</html>

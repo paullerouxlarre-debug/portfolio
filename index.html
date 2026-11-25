@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Le bac à projets de Paul — sites, applis et créations IA</title>
+<meta name="description" content="Fouillez le bac : sites internet, applications, vidéos et prototypes créés par Paul avec l'IA.">
+<meta name="theme-color" content="#efe6d5">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%231b1714'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23e4572e'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=Inter:wght@400;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="#bac"><i></i>Le bac de Paul</a>
+  <nav>
+    <a href="#bac">Le bac</a>
+    <a href="#titres">Liste des titres</a>
+    <button class="sound" id="sound" aria-pressed="false" title="Activer le son de la platine"><span class="eq"><b></b><b></b><b></b></span><span id="soundTxt">Son coupé</span></button>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div>
+      <p class="kicker">Disquaire de projets · fait avec l'IA</p>
+      <h1>Fouillez <br>le <em>bac.</em></h1>
+      <p>Sites internet, applis, vidéos et expériences du labo : chaque pochette est un projet que j'ai créé avec l'IA. Feuilletez, tirez un disque, posez-le sur la platine.</p>
+    </div>
+    <div class="stamp"><div><b id="count">0</b>disques<br>en rayon</div></div>
+  </section>
+
+  <section id="bac" aria-label="Le bac à disques">
+    <div class="dividers" id="dividers" role="toolbar" aria-label="Filtrer par face"></div>
+    <div class="crate" id="crate">
+      <div class="rail" id="rail"></div>
+      <div class="crate-front"><span>Paul · Records</span></div>
+    </div>
+    <div class="now" aria-live="polite">
+      <div class="n" id="nowN"></div>
+      <h2 id="nowT"></h2>
+      <p id="nowS"></p>
+    </div>
+    <div class="controls">
+      <button class="ctl" id="prev" aria-label="Disque précédent">←</button>
+      <button class="play" id="play">▶ Poser sur la platine</button>
+      <button class="ctl" id="next" aria-label="Disque suivant">→</button>
+    </div>
+    <p class="hint">Molette, glisser ou flèches ← → pour feuilleter · Entrée pour écouter</p>
+  </section>
+
+  <section class="tracklist" id="titres">
+    <div class="inner">
+      <p class="kicker">Au dos de la pochette</p>
+      <h2>Liste des <em>titres</em></h2>
+      <div class="sides" id="sides"></div>
+    </div>
+  </section>
+</main>
+<footer>Pressé avec Claude · hébergé sur GitHub Pages · les démos du labo sont fictives</footer>
+
+<div class="player" id="player" role="dialog" aria-modal="true" aria-labelledby="pTitle" aria-hidden="true">
+  <button class="close" id="close">Ranger le disque ✕</button>
+  <div class="deck">
+    <div class="tt" aria-hidden="true">
+      <div class="platter"><div class="vinyl" id="vinyl"><div class="label" id="vlabel"></div></div></div>
+      <div class="arm"><i></i></div>
+      <div class="knob"></div>
+      <div class="led">33 ⅓ tours</div>
+    </div>
+    <article class="notes" id="notes">
+      <figure class="polaroid" id="polaroid" hidden><img id="pImg" alt=""><figcaption>aperçu</figcaption></figure>
+      <div class="n"><span id="pN"></span><span id="pY"></span></div>
+      <h2 id="pTitle"></h2>
+      <p class="tag" id="pTag"></p>
+      <p class="desc" id="pDesc"></p>
+      <h4>Pistes</h4><ol id="pTracks"></ol>
+      <h4>Matériel</h4><div class="chips" id="pTech"></div>
+      <div class="btns" id="pLinks"></div>
+      <div class="pnav"><button id="pPrev">← Disque précédent</button><button id="pNext">Disque suivant →</button></div>
+    </article>
+  </div>
+</div>
+
+<script src="projects.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

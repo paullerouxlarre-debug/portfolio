@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Atelier Egurra — charpente et ébénisterie, Ondres (démo fictive)</title>
+<meta name="description" content="Démo de vitrine immersive pour un atelier de charpente et d'ébénisterie des Landes. Textes fictifs.">
+<meta name="theme-color" content="#1e140e">
+<!--
+  Démo QG / Léo, 2026-11-17. Textes et atelier fictifs. Aucun suivi, aucune clé.
+  Dépendances CDN : gsap + ScrollTrigger 3.13, Lenis 1.3, polices Fontsource (Fraunces, Inter).
+  Si un CDN tombe : le site reste lisible (scroll natif, fond CSS, pas de préloader bloquant).
+  Design : méthode unslop by @heydamir (CC BY 4.0). Crédits : CREDITS.md.
+-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/fraunces@5/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/inter@5/index.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Sprite : lauburu (quatre têtes), tracé au trait -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="lb" viewBox="0 0 100 100">
+    <g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round">
+      <path d="M50 50 C50 34 50 24 62 24 C72 24 77 34 71 40 C67 44 59 42 61 35"/>
+      <path d="M50 50 C50 34 50 24 62 24 C72 24 77 34 71 40 C67 44 59 42 61 35" transform="rotate(90 50 50)"/>
+      <path d="M50 50 C50 34 50 24 62 24 C72 24 77 34 71 40 C67 44 59 42 61 35" transform="rotate(180 50 50)"/>
+      <path d="M50 50 C50 34 50 24 62 24 C72 24 77 34 71 40 C67 44 59 42 61 35" transform="rotate(270 50 50)"/>
+    </g>
+  </symbol>
+  <symbol id="arrow" viewBox="0 0 16 16"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<!-- Préloader -->
+<div class="pre" id="pre" role="status" aria-label="Chargement">
+  <div class="pre-in">
+    <svg class="pre-lb" viewBox="0 0 100 100" aria-hidden="true">
+      <path pathLength="1" d="M50 50 C50 34 50 24 62 24 C72 24 77 34 71 40 C67 44 59 42 61 35"/>
+      <path pathLength="1" d="M50 50 C50 34 50 24 62 24 C72 24 77 34 71 40 C67 44 59 42 61 35" transform="rotate(90 50 50)"/>
+      <path pathLength="1" d="M50 50 C50 34 50 24 62 24 C72 24 77 34 71 40 C67 44 59 42 61 35" transform="rotate(180 50 50)"/>
+      <path pathLength="1" d="M50 50 C50 34 50 24 62 24 C72 24 77 34 71 40 C67 44 59 42 61 35" transform="rotate(270 50 50)"/>
+    </svg>
+    <p class="pre-hello" id="hello">Kaixo</p>
+  </div>
+  <div class="pre-count" aria-hidden="true"><span id="cnt">000</span> / 100</div>
+  <div class="pre-name" aria-hidden="true">Atelier Egurra</div>
+</div>
+
+<div class="cur-dot" aria-hidden="true"></div>
+<div class="cur-ring" aria-hidden="true"><span></span></div>
+<div class="progress" aria-hidden="true"></div>
+
+<nav class="nav" id="nav" aria-label="Navigation principale">
+  <a class="brand" href="#top" aria-label="Atelier Egurra, haut de page"><svg class="nav-lb" aria-hidden="true"><use href="#lb"/></svg>Egurra</a>
+  <ul>
+    <li><a href="#savoir">Savoir-faire</a></li>
+    <li><a href="#geste">Le geste</a></li>
+    <li><a href="#realisations">Réalisations</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a class="nav-cta" href="#contact" data-magnetic>Parler du projet</a>
+</nav>
+
+<main>
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="hero-bg" id="heroBg"><canvas id="gl" aria-hidden="true"></canvas></div>
+  <div class="ridge r1" data-p="12" aria-hidden="true"><svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path fill="#16271c" d="M0 400V230C90 215 160 170 260 175C360 180 420 130 520 120C620 110 690 160 780 170C880 182 940 120 1060 110C1170 102 1250 160 1340 150C1390 145 1420 150 1440 156V400Z"/></svg></div>
+  <div class="ridge r2" data-p="5" aria-hidden="true"><svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path fill="#0f1b14" d="M0 400V290C110 270 190 250 300 262C420 275 470 220 580 214C690 208 760 262 870 268C980 274 1050 230 1160 232C1270 234 1350 276 1440 270V400Z"/></svg></div>
+  <svg class="etxe" data-p="5" viewBox="0 0 120 80" aria-hidden="true">
+    <polygon points="4,36 60,6 116,36" fill="#2b1d16"/>
+    <rect x="14" y="36" width="92" height="38" fill="#efe6d4"/>
+    <g fill="none" stroke="#9c2a22" stroke-width="3">
+      <path d="M14 36V74M60 36V74M106 36V74M14 55H106"/>
+      <path d="M14 36 60 55M106 36 60 55" stroke-width="2"/>
+    </g>
+    <rect x="22" y="42" width="10" height="9" fill="#2d5a3d"/><rect x="88" y="42" width="10" height="9" fill="#2d5a3d"/>
+    <rect x="52" y="58" width="16" height="16" fill="#2d5a3d"/>
+  </svg>
+  <div class="ridge r3" data-p="-7" aria-hidden="true"><svg viewBox="0 0 1440 400" preserveAspectRatio="none"><path fill="#0a120d" d="M0 400V340C140 325 260 322 380 338C520 356 620 330 760 326C900 322 1020 352 1150 346C1270 340 1360 328 1440 334V400Z"/></svg></div>
+
+  <div class="hero-in" id="heroIn">
+    <p class="tag">Charpente &amp; ébénisterie · Ondres, Landes</p>
+    <h1><span class="line" data-split>Le bois,</span><span class="line" data-split>à la main.</span></h1>
+    <p class="lede">Un atelier de quatre personnes, entre océan et Pyrénées. Chêne des Landes, châtaignier basque, assemblages chevillés.</p>
+    <div class="cta">
+      <a class="btn" href="#realisations" data-magnetic>Voir les réalisations <svg aria-hidden="true"><use href="#arrow"/></svg></a>
+      <a class="btn ghost" href="#contact" data-magnetic>Prendre rendez-vous</a>
+    </div>
+  </div>
+  <div class="scrollhint" aria-hidden="true"><i></i>Défiler</div>
+</header>
+
+<!-- 01 MANIFESTE -->
+<section class="manif on-light" id="manifeste">
+  <div class="bg" data-clip="inset"></div>
+  <div class="wrap">
+    <p class="tag">01 — L'atelier</p>
+    <p class="manif-text" id="mtext">Chaque pièce commence par une planche choisie à la main et finit par un assemblage qui ne doit rien à la quincaillerie. Des gestes d'avant la machine, tenus avec la précision d'aujourd'hui.</p>
+    <p class="manif-sign"><svg aria-hidden="true"><use href="#lb"/></svg>Atelier fictif, Ondres (40) — démo QG</p>
+  </div>
+</section>
+
+<!-- 02 SAVOIR-FAIRE (scroll horizontal) -->
+<section class="hs" id="savoir">
+  <div class="bg" data-clip="inset"></div>
+  <div class="hs-head">
+    <div>
+      <p class="tag">02 — Savoir-faire</p>
+      <h2 data-reveal>Quatre gestes, une exigence.</h2>
+    </div>
+    <div class="hs-prog" aria-hidden="true"><i></i></div>
+  </div>
+  <div class="hs-track" data-cursor="glisser">
+    <article class="panel">
+      <div>
+        <div class="panel-num" aria-hidden="true">01</div>
+        <h3>Charpente</h3>
+        <p>Fermes, pannes et chevrons taillés à l'ancienne, levés sans une vis apparente. Neuf ou rénovation.</p>
+        <dl><dt>Essences</dt><dd>chêne, châtaignier</dd><dt>Assemblage</dt><dd>tenon, mortaise, cheville</dd></dl>
+      </div>
+      <div class="panel-art"><svg viewBox="0 0 400 300" aria-hidden="true">
+        <path class="stk" d="M20 250 200 60 380 250Z"/><path class="stk" d="M20 250H380M200 60V250M200 150 110 250M200 150 290 250"/>
+        <g class="stk-r"><circle cx="200" cy="60" r="6"/><circle cx="20" cy="250" r="6"/><circle cx="380" cy="250" r="6"/><circle cx="200" cy="250" r="6"/><circle cx="200" cy="150" r="6"/></g>
+      </svg></div>
+    </article>
+    <article class="panel">
+      <div>
+        <div class="panel-num" aria-hidden="true">02</div>
+        <h3>Escalier</h3>
+        <p>Droits, quart-tournants, hélicoïdaux. Chaque marche est ajustée sur place, au millimètre.</p>
+        <dl><dt>Essences</dt><dd>chêne, noyer</dd><dt>Finition</dt><dd>huile dure, cire d'abeille</dd></dl>
+      </div>
+      <div class="panel-art"><svg viewBox="0 0 400 300" aria-hidden="true">
+        <g class="wood stk"><rect x="30" y="230" width="80" height="30"/><rect x="100" y="190" width="80" height="30"/><rect x="170" y="150" width="80" height="30"/><rect x="240" y="110" width="80" height="30"/><rect x="310" y="70" width="70" height="30"/></g>
+        <path class="stk-r" d="M30 270 380 110"/>
+      </svg></div>
+    </article>
+    <article class="panel">
+      <div>
+        <div class="panel-num" aria-hidden="true">03</div>
+        <h3>Mobilier</h3>
+        <p>Tables, bibliothèques, buffets. Du bois massif, des pieds chevillés, des pièces faites pour durer trois générations.</p>
+        <dl><dt>Essences</dt><dd>chêne, merisier</dd><dt>Délai</dt><dd>à définir ensemble</dd></dl>
+      </div>
+      <div class="panel-art"><svg viewBox="0 0 400 300" aria-hidden="true">
+        <g class="stk"><rect class="wood" x="40" y="100" width="320" height="26"/><rect class="wood-2" x="70" y="126" width="22" height="130"/><rect class="wood-2" x="308" y="126" width="22" height="130"/><rect class="wood-2" x="92" y="196" width="216" height="14"/></g>
+        <g class="stk-r"><circle cx="81" cy="113" r="4"/><circle cx="319" cy="113" r="4"/><circle cx="81" cy="203" r="4"/><circle cx="319" cy="203" r="4"/></g>
+      </svg></div>
+    </article>
+    <article class="panel">
+      <div>
+        <div class="panel-num" aria-hidden="true">04</div>
+        <h3>Restauration</h3>
+        <p>Une poutre fatiguée, un meuble de famille. On répare à la greffe, on garde la patine et l'histoire.</p>
+        <dl><dt>Approche</dt><dd>réparer avant de remplacer</dd><dt>Visite</dt><dd>sur rendez-vous</dd></dl>
+      </div>
+      <div class="panel-art"><svg viewBox="0 0 400 300" aria-hidden="true">
+        <g class="stk"><circle cx="200" cy="150" r="120"/><circle cx="200" cy="150" r="96"/><circle cx="200" cy="150" r="72"/><circle cx="200" cy="150" r="48"/><circle cx="200" cy="150" r="24"/></g>
+        <path class="stk-r" d="M200 150 L296 54 A136 136 0 0 1 320 98Z" transform="translate(0 0)"/>
+      </svg></div>
+    </article>
+  </div>
+</section>
+
+<!-- 03 LE GESTE (assemblage au scroll) -->
+<section class="geste" id="geste">
+  <div class="bg" data-clip="inset"></div>
+  <div class="wrap geste-grid">
+    <div>
+      <p class="tag">03 — Le geste</p>
+      <h2 data-reveal>Deux pièces, une cheville.</h2>
+      <ol class="steps" id="steps">
+        <li><b>On approche</b><span>Les deux pièces sont taillées pour se reconnaître.</span></li>
+        <li><b>On emboîte</b><span>Le tenon entre dans la mortaise, sans jeu.</span></li>
+        <li><b>On cheville</b><span>Une cheville de chêne verrouille tout, sans colle.</span></li>
+      </ol>
+    </div>
+    <div>
+      <svg class="joint" viewBox="0 0 800 400" role="img" aria-label="Schéma d'un assemblage à tenon et mortaise verrouillé par une cheville">
+        <defs>
+          <linearGradient id="wA" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#c08a52"/><stop offset="1" stop-color="#a87442"/></linearGradient>
+          <linearGradient id="wB" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#a97543"/><stop offset="1" stop-color="#8d5d33"/></linearGradient>
+        </defs>
+        <ellipse cx="400" cy="318" rx="330" ry="14" fill="rgba(0,0,0,.25)"/>
+        <g id="beamB">
+          <path d="M360 150H740V250H360V220H460V180H360Z" fill="url(#wB)" class="edge"/>
+          <g class="grain"><path d="M480 168C560 160 640 176 730 166"/><path d="M370 200C470 194 600 208 730 198"/><path d="M480 232C560 226 650 238 730 230"/></g>
+        </g>
+        <g id="beamA">
+          <path d="M60 150H360V180H460V220H360V250H60Z" fill="url(#wA)" class="edge"/>
+          <g class="grain"><path d="M70 168C150 160 230 176 350 166"/><path d="M70 200C170 194 300 208 450 198"/><path d="M70 232C150 226 240 238 350 230"/></g>
+        </g>
+        <path id="jline" pathLength="1" d="M360 180H460V220H360" fill="none" stroke="#c4574b" stroke-width="3" stroke-linecap="round" stroke-dasharray="1" stroke-dashoffset="0"/>
+        <g id="peg"><rect x="402" y="132" width="16" height="136" rx="3" fill="#5b3a1f" class="edge"/><rect x="402" y="132" width="16" height="10" rx="2" fill="#7a5230"/></g>
+      </svg>
+      <p class="joint-cap"><span>Tenon-mortaise chevillé</span><span>Schéma d'illustration</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- 04 RÉALISATIONS -->
+<section class="works on-light" id="realisations">
+  <div class="bg" data-clip="dome"></div>
+  <div class="wrap">
+    <div class="works-head">
+      <div>
+        <p class="tag">04 — Réalisations</p>
+        <h2 data-reveal>Pièces choisies.</h2>
+      </div>
+      <p>Trois exemples fictifs, dessinés en SVG pour la démo. Survole une image : le bois se met à bouger.</p>
+    </div>
+    <div class="cards">
+      <a class="card" href="#contact" data-cursor="voir">
+        <div class="card-art"><div class="card-img"><svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <rect width="800" height="600" fill="#c79a68"/>
+          <g transform="translate(400 300)" fill="#7a4c28" stroke="#3b2616" stroke-width="2">
+            <rect x="48" y="-16" width="250" height="32" transform="rotate(0)"/><rect x="48" y="-16" width="250" height="32" transform="rotate(30)"/><rect x="48" y="-16" width="250" height="32" transform="rotate(60)"/>
+            <rect x="48" y="-16" width="250" height="32" transform="rotate(90)"/><rect x="48" y="-16" width="250" height="32" transform="rotate(120)"/><rect x="48" y="-16" width="250" height="32" transform="rotate(150)"/>
+            <rect x="48" y="-16" width="250" height="32" transform="rotate(180)"/><rect x="48" y="-16" width="250" height="32" transform="rotate(210)"/><rect x="48" y="-16" width="250" height="32" transform="rotate(240)"/>
+            <rect x="48" y="-16" width="250" height="32" transform="rotate(270)"/><rect x="48" y="-16" width="250" height="32" transform="rotate(300)"/><rect x="48" y="-16" width="250" height="32" transform="rotate(330)"/>
+            <circle r="46" fill="#2a1a10"/><circle r="24" fill="none" stroke="#c4574b" stroke-width="4"/>
+          </g>
+        </svg></div></div>
+        <div class="card-meta"><h3>Escalier hélicoïdal, noyer</h3><span>2025 · Landes</span></div>
+      </a>
+      <a class="card" href="#contact" data-cursor="voir">
+        <div class="card-art"><div class="card-img"><svg viewBox="0 0 600 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <rect width="600" height="800" fill="#d9c7a5"/>
+          <circle cx="470" cy="190" r="54" fill="#9c2a22"/>
+          <g fill="none" stroke="#6c4528" stroke-width="26"><path d="M60 620 300 260 540 620Z"/><path d="M60 620H540M300 260V620M300 450 180 620M300 450 420 620"/></g>
+          <g fill="#efe6d4" stroke="#2b1d16" stroke-width="3"><circle cx="300" cy="260" r="10"/><circle cx="300" cy="450" r="10"/><circle cx="60" cy="620" r="10"/><circle cx="540" cy="620" r="10"/><circle cx="300" cy="620" r="10"/></g>
+          <path d="M0 700C120 660 220 690 330 670C440 650 520 680 600 660V800H0Z" fill="#2d5a3d"/>
+        </svg></div></div>
+        <div class="card-meta"><h3>Ferme de charpente, chêne</h3><span>2024 · Pays basque</span></div>
+      </a>
+      <a class="card" href="#contact" data-cursor="voir">
+        <div class="card-art"><div class="card-img"><svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <rect width="800" height="600" fill="#2b1b10"/>
+          <rect x="40" y="0" width="150" height="600" fill="#a3703f"/><rect x="190" y="0" width="160" height="600" fill="#b0804d"/><rect x="350" y="0" width="150" height="600" fill="#98663a"/><rect x="500" y="0" width="150" height="600" fill="#ab7a47"/><rect x="650" y="0" width="110" height="600" fill="#9a693c"/>
+          <g fill="none" stroke="rgba(43,27,16,.35)" stroke-width="2"><path d="M80 0C60 200 110 400 80 600M130 0C110 200 160 400 130 600M240 0C220 200 270 400 240 600M300 0C280 200 330 400 300 600M400 0C380 200 430 400 400 600M560 0C540 200 590 400 560 600M700 0C680 200 730 400 700 600"/></g>
+          <g fill="#2b1b10"><path d="M190 270 205 300 190 330 175 300Z"/><path d="M500 270 515 300 500 330 485 300Z"/></g>
+        </svg></div></div>
+        <div class="card-meta"><h3>Table à planches, chêne</h3><span>2025 · Ondres</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 05 CONTACT -->
+<section class="contact" id="contact">
+  <div class="bg" data-clip="dome"></div>
+  <div class="wrap">
+    <p class="tag">05 — Contact</p>
+    <h2 data-reveal>Parlons de <em>votre</em> projet.</h2>
+    <div class="contact-row">
+      <dl>
+        <dt>Écrire</dt><dd><a href="mailto:bonjour@egurra.example">bonjour@egurra.example</a></dd>
+        <dt>Appeler</dt><dd><a href="tel:+330500000000">05 00 00 00 00</a></dd>
+        <dt>Atelier</dt><dd>Zone artisanale, Ondres (40)</dd>
+      </dl>
+      <a class="round" href="mailto:bonjour@egurra.example" data-magnetic>Écrire</a>
+    </div>
+  </div>
+  <div class="marquee" aria-hidden="true"><div class="marquee-track" id="mq">
+    <span>Charpente</span><span>Escalier</span><span>Mobilier</span><span>Restauration</span>
+    <span>Charpente</span><span>Escalier</span><span>Mobilier</span><span>Restauration</span>
+  </div></div>
+  <div class="foot"><span>Démo fictive : l'Atelier Egurra n'existe pas. Coordonnées factices.</span><span>Conçu par QG · design : unslop by @heydamir (CC BY 4.0)</span></div>
+</section>
+</main>
+
+<!-- Filtres de distorsion (survol des cartes) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="d0" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G"/></filter>
+  <filter id="d1" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="8" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G"/></filter>
+  <filter id="d2" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="14" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G"/></filter>
+</svg>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.min.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

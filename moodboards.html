@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolio de Paul — moodboards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,800&family=Space+Mono:wght@400;700&family=Monoton&family=Pacifico&family=Inter:wght@400;600;800&family=VT323&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}
+body{background:#111;color:#eee;font:15px/1.5 Inter,system-ui,sans-serif;padding:32px 20px 60px}
+header{max-width:1100px;margin:0 auto 28px}
+header h1{font:800 28px Inter}header p{color:#999;max-width:70ch}
+.grid{max-width:1100px;margin:auto;display:grid;gap:22px}
+.board{border-radius:18px;overflow:hidden;display:grid;grid-template-columns:1.25fr 1fr;min-height:330px}
+@media(max-width:760px){.board{grid-template-columns:1fr}}
+.stage{position:relative;overflow:hidden;display:grid;place-items:center}
+.info{padding:22px 24px;display:flex;flex-direction:column;gap:10px}
+.info h2{font-size:24px;line-height:1.1}.num{font:700 12px 'Space Mono';opacity:.6;letter-spacing:.15em}
+.info p{font-size:14px;opacity:.85}
+.sw{display:flex;gap:6px;margin-top:auto}.sw i{width:38px;height:38px;border-radius:50%;border:2px solid rgba(255,255,255,.15)}
+.tags{font:12px 'Space Mono';opacity:.7}
+/* 1 Bac à vinyles */
+.b1{background:#efe6d5;color:#1b1714}.b1 .stage{background:#e2d3b8}
+.b1 h2{font-family:Fraunces;font-weight:800}
+.crate{display:flex;perspective:700px;gap:0}
+.sleeve{width:110px;height:150px;margin-left:-60px;border-radius:3px;transform:rotateY(38deg);box-shadow:-6px 6px 18px rgba(0,0,0,.25);transition:.4s;position:relative}
+.sleeve:first-child{margin-left:0}.sleeve:hover{transform:rotateY(0) translateY(-34px) scale(1.08);z-index:2}
+.sleeve::after{content:"";position:absolute;right:-28px;top:12px;width:120px;height:120px;border-radius:50%;background:repeating-radial-gradient(#111 0 2px,#222 2px 4px);z-index:-1;transition:.4s}
+.sleeve:hover::after{right:-70px;animation:spin 2s linear infinite}
+.turn{position:absolute;right:18px;bottom:16px;width:90px;height:90px;border-radius:50%;background:repeating-radial-gradient(#111 0 2px,#2a2a2a 2px 3px);animation:spin 1.8s linear infinite}
+.turn::after{content:"";position:absolute;inset:34px;border-radius:50%;background:#e4572e}
+/* 2 Mixtape */
+.b2{background:#f6d6c8;color:#2b1d3a}.b2 .stage{background:linear-gradient(135deg,#ff9a8b,#ffd36e 60%,#8fd3c7)}
+.b2 h2{font-family:'Space Mono';font-weight:700}
+.tape{width:280px;height:178px;background:#2b1d3a;border-radius:14px;padding:16px;position:relative;box-shadow:0 14px 30px rgba(0,0,0,.25)}
+.label{background:#fff6e8;border-radius:6px;height:96px;padding:8px 12px;font:13px 'Space Mono';color:#2b1d3a}
+.label b{display:block;border-bottom:2px dashed #ff6f61;margin-bottom:6px}
+.win{position:absolute;left:50%;top:76px;transform:translateX(-50%);width:150px;height:40px;background:#3d2c50;border-radius:20px;display:flex;justify-content:space-between;align-items:center;padding:0 8px}
+.reel{width:28px;height:28px;border-radius:50%;border:5px dotted #fff6e8;animation:spin 3s linear infinite}
+.track{position:absolute;bottom:14px;left:0;right:0;text-align:center;font:12px 'Space Mono';color:#fff;animation:blink 1.2s steps(2) infinite}
+/* 3 Jukebox néon */
+.b3{background:#120914;color:#ffe9f3}.b3 .stage{background:radial-gradient(circle at 50% 120%,#3b0d2c,#120914 70%)}
+.b3 h2{font-family:Monoton;font-weight:400;font-size:28px;color:#ff4fa3;text-shadow:0 0 12px #ff4fa3}
+.juke{width:220px;height:260px;border-radius:110px 110px 16px 16px;border:6px solid #ff4fa3;box-shadow:0 0 18px #ff4fa3,inset 0 0 18px #ff4fa3;display:grid;place-items:center;animation:glow 2.4s ease-in-out infinite}
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:150px}
+.slots span{font:11px 'Space Mono';background:#ffe9f3;color:#120914;border-radius:3px;padding:3px 5px;animation:sel 4s infinite}
+.slots span:nth-child(2){animation-delay:1s}.slots span:nth-child(3){animation-delay:2s}.slots span:nth-child(4){animation-delay:3s}
+.bub{position:absolute;bottom:-20px;width:10px;height:10px;border-radius:50%;background:#7ff6d4;box-shadow:0 0 8px #7ff6d4;animation:up 4s linear infinite}
+/* 4 Radio FM */
+.b4{background:#2a1c12;color:#f3e2c4}.b4 .stage{background:repeating-linear-gradient(90deg,#4a3020 0 7px,#3f281a 7px 13px)}
+.b4 h2{font-family:Fraunces;font-weight:400;font-style:italic}
+.radio{width:300px;background:#1a110b;border-radius:12px;padding:16px;box-shadow:0 0 0 4px #c89b5c}
+.dial{height:70px;background:linear-gradient(#ffcf7a,#e9a641);border-radius:6px;position:relative;box-shadow:0 0 22px #ffb84d;overflow:hidden}
+.dial small{position:absolute;top:8px;font:10px 'Space Mono';color:#3a2410}
+.needle{position:absolute;top:0;bottom:0;width:3px;background:#c0262d;animation:tune 6s ease-in-out infinite}
+.now{margin-top:10px;font:22px VT323;color:#ffb84d;text-shadow:0 0 6px #ff8a00;white-space:nowrap;overflow:hidden}
+.knobs{display:flex;justify-content:space-between;margin-top:10px}.knobs i{width:34px;height:34px;border-radius:50%;background:conic-gradient(#c89b5c,#6b4a2a,#c89b5c);animation:wob 6s ease-in-out infinite}
+/* 5 Constellation */
+.b5{background:#05070f;color:#dfe8ff}.b5 .stage{background:radial-gradient(circle at 30% 30%,#1b2a6b,#05070f 70%)}
+.b5 h2{font-weight:800;letter-spacing:-.02em;background:linear-gradient(90deg,#9ecbff,#e3a6ff);-webkit-background-clip:text;color:transparent}
+.orbit{position:absolute;border:1px solid rgba(158,203,255,.25);border-radius:50%;animation:spin linear infinite}
+.orbit b{position:absolute;top:-7px;left:50%;width:14px;height:14px;border-radius:50%}
+.core{width:46px;height:46px;border-radius:50%;background:radial-gradient(#fff,#9ecbff 40%,transparent 70%);box-shadow:0 0 40px #9ecbff}
+.star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:blink 2s infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{50%{opacity:.25}}
+@keyframes glow{50%{box-shadow:0 0 34px #ff4fa3,inset 0 0 30px #ff4fa3}}
+@keyframes sel{0%,20%{background:#7ff6d4}25%,100%{background:#ffe9f3}}
+@keyframes up{to{transform:translateY(-360px);opacity:0}}
+@keyframes tune{0%{left:8%}30%{left:38%}55%{left:62%}80%{left:88%}100%{left:8%}}
+@keyframes wob{50%{transform:rotate(120deg)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+footer{max-width:1100px;margin:30px auto 0;color:#999;font-size:14px}
+</style></head><body>
+<header><h1>Portfolio — 5 ambiances à choisir</h1>
+<p>Chaque planche montre la palette, la typo et le geste d'animation. Survole les éléments. Dis-moi un numéro (ou un mélange : « la typo du 1 avec les couleurs du 4 »).</p></header>
+<div class="grid">
+
+<section class="board b1"><div class="stage">
+ <div class="crate">
+  <div class="sleeve" style="background:#e4572e"></div><div class="sleeve" style="background:#2e4a3f"></div>
+  <div class="sleeve" style="background:#f2b134"></div><div class="sleeve" style="background:#1b1714"></div><div class="sleeve" style="background:#6c8ead"></div>
+ </div><div class="turn"></div></div>
+ <div class="info"><span class="num">01 · LE BAC À VINYLES</span><h2>On fouille un bac de disques</h2>
+ <p>Chaque projet est une pochette. On les feuillette, on en tire une : le disque glisse sur la platine, tourne, et la « face B » détaille le projet avec le bouton pour l'ouvrir.</p>
+ <p class="tags">Papier crème · serif Fraunces · chaud, artisanal, haut de gamme</p>
+ <div class="sw"><i style="background:#efe6d5"></i><i style="background:#1b1714"></i><i style="background:#e4572e"></i><i style="background:#f2b134"></i><i style="background:#2e4a3f"></i></div></div></section>
+
+<section class="board b2"><div class="stage">
+ <div class="tape"><div class="label"><b>PAUL — MIXTAPE IA</b>A1 Fournil · A2 Binocles<br>B1 Rythme · B2 TikTok</div>
+ <div class="win"><span class="reel"></span><span class="reel"></span></div><div class="track">▶ PLAY</div></div></div>
+ <div class="info"><span class="num">02 · LA MIXTAPE</span><h2>Une cassette, face A / face B</h2>
+ <p>Face A les sites, face B les applis et vidéos. Avance rapide ⏩ pour passer d'un projet à l'autre, les bobines tournent, le titre s'écrit au feutre.</p>
+ <p class="tags">Années 80 · Space Mono · coucher de soleil pastel, joyeux</p>
+ <div class="sw"><i style="background:#ff9a8b"></i><i style="background:#ffd36e"></i><i style="background:#8fd3c7"></i><i style="background:#2b1d3a"></i><i style="background:#fff6e8"></i></div></div></section>
+
+<section class="board b3"><div class="stage">
+ <div class="juke"><div class="slots"><span>A1 SITES</span><span>B2 APPS</span><span>C3 VIDÉO</span><span>D4 LABO</span></div></div>
+ <i class="bub" style="left:20%"></i><i class="bub" style="left:45%;animation-delay:1.3s"></i><i class="bub" style="left:75%;animation-delay:2.6s"></i></div>
+ <div class="info"><span class="num">03 · LE JUKEBOX NÉON</span><h2>Choisis un titre, mets une pièce</h2>
+ <p>Un jukebox de diner : on tape A1, B2… la sélection s'allume, le bras mécanique va chercher le projet. Effets néon, bulles qui montent.</p>
+ <p class="tags">Nuit, néon rose et menthe · Monoton + Pacifico · spectaculaire</p>
+ <div class="sw"><i style="background:#120914"></i><i style="background:#ff4fa3"></i><i style="background:#7ff6d4"></i><i style="background:#ffe9f3"></i><i style="background:#c0c0c0"></i></div></div></section>
+
+<section class="board b4"><div class="stage">
+ <div class="radio"><div class="dial"><small style="left:6%">SITES</small><small style="left:34%">APPS</small><small style="left:58%">VIDÉO</small><small style="left:82%">LABO</small><div class="needle"></div></div>
+ <div class="now">♪ 98.4 FM — Fournil des Chaouches</div><div class="knobs"><i></i><i></i></div></div></div>
+ <div class="info"><span class="num">04 · LE POSTE RADIO</span><h2>On tourne le bouton, on capte un projet</h2>
+ <p>Un vieux poste en bois : l'aiguille glisse sur la bande FM, chaque station est un projet. Grésillement léger à l'arrivée, cadran ambré qui s'illumine.</p>
+ <p class="tags">Bois et laiton · Fraunces italique + VT323 · nostalgique, chaleureux</p>
+ <div class="sw"><i style="background:#2a1c12"></i><i style="background:#c89b5c"></i><i style="background:#ffb84d"></i><i style="background:#c0262d"></i><i style="background:#f3e2c4"></i></div></div></section>
+
+<section class="board b5"><div class="stage" id="sky">
+ <div class="orbit" style="width:120px;height:120px;animation-duration:9s"><b style="background:#e3a6ff"></b></div>
+ <div class="orbit" style="width:200px;height:200px;animation-duration:15s"><b style="background:#9ecbff"></b></div>
+ <div class="orbit" style="width:280px;height:280px;animation-duration:24s"><b style="background:#ffd36e"></b></div>
+ <div class="core"></div></div>
+ <div class="info"><span class="num">05 · LA CONSTELLATION (option innovante)</span><h2>Une galaxie de projets</h2>
+ <p>Sans musique : chaque univers (sites, applis, vidéo, labo) est une orbite, chaque projet une planète. On glisse dans l'espace, on zoome sur une planète pour l'ouvrir.</p>
+ <p class="tags">Espace profond · Inter extra-gras · futuriste, « IA »</p>
+ <div class="sw"><i style="background:#05070f"></i><i style="background:#1b2a6b"></i><i style="background:#9ecbff"></i><i style="background:#e3a6ff"></i><i style="background:#ffd36e"></i></div></div></section>
+</div>
+<footer>Contenu prévu, quelle que soit l'ambiance : 5 sites publics (Cartonnages Larré, Au Monde des Binocles, Fournil des Chaouches, Mes Collections, Rythme), les applis (Palier, Relais, Témoin, Atlas 1302, Check-Occaz), Histoires en 30s, et le labo (Egurra, Pin Sec, Gouf, Shape Brume, Ondres…).</footer>
+<script>const s=document.getElementById('sky');for(let i=0;i<40;i++){const e=document.createElement('i');e.className='star';e.style.left=Math.random()*100+'%';e.style.top=Math.random()*100+'%';e.style.animationDelay=Math.random()*2+'s';s.appendChild(e)}</script>
+</body></html>

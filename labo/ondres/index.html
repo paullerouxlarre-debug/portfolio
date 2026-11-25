@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ondres, hier et aujourd'hui (démo)</title>
+<style>
+:root{--bg:#1b1713;--fg:#f1e8d8;--muted:#b9ab94;--accent:#d9a441}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.5 Georgia,"Times New Roman",serif;min-height:100vh}
+main{max-width:880px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:clamp(1.6rem,5vw,2.4rem);line-height:1.1;margin:.2em 0 .1em}
+.sub{color:var(--muted);margin:0 0 18px}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+nav button,.tools button{font:inherit;font-size:.9rem;padding:8px 14px;border:1px solid #4a4033;background:transparent;color:var(--fg);border-radius:4px;cursor:pointer}
+nav button[aria-pressed=true]{background:var(--accent);color:#1b1713;border-color:var(--accent)}
+button:focus-visible,#stage:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#stage{position:relative;width:100%;aspect-ratio:3/2;overflow:hidden;border-radius:4px;background:#000;touch-action:none;cursor:none;user-select:none;-webkit-user-select:none}
+#stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+#now{--x:50%;--y:50%;--r:0px;
+ -webkit-mask-image:radial-gradient(circle var(--r) at var(--x) var(--y),#000 70%,transparent 100%);
+ mask-image:radial-gradient(circle var(--r) at var(--x) var(--y),#000 70%,transparent 100%)}
+.tag{position:absolute;top:10px;left:10px;font:.75rem/1 system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;background:rgba(0,0,0,.6);padding:6px 8px;border-radius:3px}
+.ph{position:absolute;right:10px;top:10px;font:.7rem/1 system-ui,sans-serif;background:#a33;padding:6px 8px;border-radius:3px}
+.hint{position:absolute;inset:auto 0 12px 0;text-align:center;font:.85rem system-ui,sans-serif;color:#fff;text-shadow:0 1px 3px #000;pointer-events:none;transition:opacity .4s}
+.hint.off{opacity:0}
+.tools{display:flex;gap:8px;margin:12px 0}
+.cap{color:var(--muted);font-size:.95rem}
+.cap strong{color:var(--fg)}
+footer{margin-top:26px;color:var(--muted);font:.8rem/1.5 system-ui,sans-serif;border-top:1px solid #3a3027;padding-top:12px}
+@media (prefers-reduced-motion:reduce){.hint{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<h1 id="titre">Ondres, même lieu, un siècle plus tard</h1>
+<p class="sub">Passe le doigt ou le curseur sur la carte postale : le lieu apparaît tel qu'il est aujourd'hui.</p>
+<nav id="lieux" aria-label="Choisir un lieu"></nav>
+
+<div id="stage" tabindex="0" role="img" aria-label="Carte postale ancienne ; déplace le pointeur ou les flèches du clavier pour révéler la photo actuelle">
+  <img id="then" alt="">
+  <img id="now" alt="">
+  <span class="tag" id="tag">Hier</span>
+  <span class="ph" id="ph" hidden>IMAGE DE DÉMONSTRATION (placeholder)</span>
+  <div class="hint" id="hint">Glisse pour révéler</div>
+</div>
+
+<div class="tools">
+  <button id="all" type="button">Tout révéler / recouvrir</button>
+</div>
+<p class="cap" id="cap"></p>
+
+<footer id="credits"></footer>
+</main>
+
+<script>
+/* ============ CONFIG : à remplir par Paul (rien d'inventé ici) ============
+   Pour chaque lieu : then = carte postale ancienne, now = photo actuelle, même cadrage.
+   Laisser then/now vides = placeholder dessiné par le code (aucune image externe).
+   Avant toute mise en ligne : droits de chaque carte vérifiés (voir la note de livrable). */
+const LIEUX = [
+  { nom:"Lieu 1 (à nommer)", then:"", now:"",
+    legende:"Carte de [année à vérifier] · photographe/éditeur : [à relever au dos] · photo actuelle : Paul, [date].",
+    credit:"Placeholder dessiné par le code, aucun crédit requis." },
+  { nom:"Lieu 2 (à nommer)", then:"", now:"",
+    legende:"Carte de [année à vérifier] · photographe/éditeur : [à relever au dos] · photo actuelle : Paul, [date].",
+    credit:"Placeholder dessiné par le code, aucun crédit requis." },
+  { nom:"Lieu 3 (à nommer)", then:"", now:"",
+    legende:"Carte de [année à vérifier] · photographe/éditeur : [à relever au dos] · photo actuelle : Paul, [date].",
+    credit:"Placeholder dessiné par le code, aucun crédit requis." }
+];
+const RAYON = 110;   // taille de la loupe en px (réglable)
+/* ======================================================================= */
+
+const $ = id => document.getElementById(id);
+const stage=$("stage"), then=$("then"), now=$("now"), hint=$("hint");
+let courant=0, ouvert=false, px=.5, py=.5;
+
+/* Placeholders : SVG en data-URI, deux versions d'une même rue. */
+function placeholder(i, apres){
+  const t = ["Rue","Place","Église"][i%3];
+  const ciel = apres ? "#7fb2d9" : "#d8c8a4", sol = apres ? "#6d6d72" : "#a89572";
+  const mur = apres ? "#e8e2d6" : "#c2b08a", toit = apres ? "#b5523b" : "#7a6a4c";
+  const voiture = apres ? `<rect x="560" y="400" width="130" height="38" rx="10" fill="#2c5f9e"/><rect x="590" y="378" width="70" height="28" rx="8" fill="#2c5f9e"/><circle cx="590" cy="440" r="14" fill="#111"/><circle cx="662" cy="440" r="14" fill="#111"/>
+     <rect x="60" y="150" width="10" height="250" fill="#555"/><rect x="40" y="145" width="50" height="10" fill="#555"/>`
+     : `<rect x="600" y="410" width="90" height="28" rx="4" fill="#5a4a30"/><circle cx="620" cy="442" r="16" fill="#3a2f20"/><circle cx="672" cy="442" r="16" fill="#3a2f20"/>`;
+  const grain = apres ? "" : `<filter id="g"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2"/><feColorMatrix values="0 0 0 0 .3  0 0 0 0 .25  0 0 0 0 .15  0 0 0 .35 0"/></filter><rect width="900" height="600" filter="url(#g)"/>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600">
+   <rect width="900" height="600" fill="${ciel}"/>
+   <rect y="380" width="900" height="220" fill="${sol}"/>
+   <rect x="120" y="190" width="300" height="200" fill="${mur}"/>
+   <polygon points="105,190 270,110 435,190" fill="${toit}"/>
+   <rect x="170" y="240" width="50" height="70" fill="#3a3a3a"/><rect x="320" y="240" width="50" height="70" fill="#3a3a3a"/>
+   <rect x="245" y="300" width="50" height="90" fill="#5b3b24"/>
+   <rect x="470" y="150" width="90" height="240" fill="${mur}"/><polygon points="460,150 515,80 570,150" fill="${toit}"/>
+   ${voiture}
+   ${grain}
+   <text x="450" y="560" text-anchor="middle" font-family="Georgia,serif" font-size="30" fill="${apres?"#fff":"#4a3d26"}" opacity=".85">${t} · ${apres?"aujourd'hui":"autrefois"} (placeholder)</text>
+  </svg>`;
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+
+function charger(i){
+  courant=i; ouvert=false;
+  const L=LIEUX[i], vrai = L.then && L.now;
+  then.src = vrai ? L.then : placeholder(i,false);
+  now.src  = vrai ? L.now  : placeholder(i,true);
+  if(vrai){ then.alt="Carte postale ancienne : "+L.nom; now.alt="Photo actuelle : "+L.nom; }
+  else { then.alt=now.alt=""; }
+  $("ph").hidden = !!vrai;
+  $("cap").innerHTML = "<strong>"+L.nom+"</strong><br>"+L.legende;
+  $("credits").textContent = "Crédits : "+L.credit+" — Démo gratuite, aucun suivi, aucun service externe.";
+  document.querySelectorAll("#lieux button").forEach((b,k)=>b.setAttribute("aria-pressed",k===i));
+  hint.classList.remove("off");
+  rayon(0);
+}
+function rayon(r){ now.style.setProperty("--r", r+"px"); }
+function pos(x,y){
+  px=x; py=y;
+  now.style.setProperty("--x",(x*100)+"%"); now.style.setProperty("--y",(y*100)+"%");
+  $("tag").textContent = "Aujourd'hui";
+}
+function suivre(e){
+  const b=stage.getBoundingClientRect();
+  pos((e.clientX-b.left)/b.width,(e.clientY-b.top)/b.height);
+  const r = Math.max(RAYON, RAYON*(b.width/600));   // loupe proportionnelle sur grand écran
+  rayon(ouvert ? Math.hypot(b.width,b.height) : r);
+  hint.classList.add("off");
+}
+stage.addEventListener("pointerdown",e=>{stage.setPointerCapture(e.pointerId);suivre(e)});
+stage.addEventListener("pointermove",suivre);
+stage.addEventListener("pointerleave",e=>{ if(!ouvert){rayon(0);$("tag").textContent="Hier"} });
+stage.addEventListener("pointerup",e=>{ if(e.pointerType!=="mouse" && !ouvert){rayon(0);$("tag").textContent="Hier"} });
+stage.addEventListener("keydown",e=>{
+  const pas=.06, k=e.key;
+  if(k==="ArrowLeft") px-=pas; else if(k==="ArrowRight") px+=pas;
+  else if(k==="ArrowUp") py-=pas; else if(k==="ArrowDown") py+=pas;
+  else if(k===" "||k==="Enter"){ basculer(); e.preventDefault(); return; }
+  else return;
+  e.preventDefault();
+  px=Math.min(1,Math.max(0,px)); py=Math.min(1,Math.max(0,py));
+  pos(px,py); rayon(ouvert?3000:RAYON*1.4); hint.classList.add("off");
+});
+function basculer(){
+  ouvert=!ouvert;
+  rayon(ouvert?3000:0);
+  $("tag").textContent = ouvert ? "Aujourd'hui" : "Hier";
+  hint.classList.add("off");
+}
+$("all").addEventListener("click",basculer);
+
+LIEUX.forEach((L,i)=>{
+  const b=document.createElement("button"); b.type="button"; b.textContent=L.nom;
+  b.onclick=()=>charger(i); $("lieux").appendChild(b);
+});
+charger(0);
+</script>
+</body>
+</html>

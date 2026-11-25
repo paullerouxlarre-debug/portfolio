@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shape Brume, surf shaper (démo fictive)</title>
+<meta name="description" content="Démo fictive de site immersif pour un shaper de planches de surf landais. Aucune entreprise réelle.">
+<!--
+  DÉMO FICTIVE (QG, Léo, 2026-11-16). Aucune entreprise réelle, aucun texte réel.
+  Effet choisi : planche 3D légère (Three.js, CDN) générée en code, qui tourne au fil du défilement et au doigt.
+
+  Comparatif des 3 effets envisagés pour un shaper :
+  1. Planche en 3D qui change d'angle à chaque étape (tracé, rocker, rails, ailerons) : on ne voit une courbe de rocker qu'en volume. CHOISI.
+  2. Parallaxe de vagues et de dunes : beau mais générique, vaut pour n'importe quel métier de la côte.
+  3. Scroll cinématique sur photos de session : demande de vraies photos, hors périmètre (aucune photo sous droit).
+
+  Aucun modèle ni texture téléchargés : la planche est un maillage calculé (≈ 5 000 sommets) et une texture dessinée en canvas.
+  Dépendance : three r149 (jsdelivr), version fixée avant l'avertissement de dépréciation du build global.
+  Repli : si WebGL ou le CDN manque, une silhouette SVG de la planche s'affiche et le texte reste intact.
+  La 3D ne porte aucune information : tout le contenu est en HTML.
+  Direction visuelle : principes de la skill unslop by @heydamir (CC BY 4.0).
+-->
+<style>
+:root{
+  --bg:#0F1A1C; --surface:#162427; --ink:#E8EEEC; --ink2:#9FB0AE; --line:rgba(232,238,236,.14);
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+body{font:400 17px/1.6 var(--sans);background:var(--bg);color:var(--ink);overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.btn{display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 24px;border-radius:8px;font:500 16px/1 var(--sans);text-decoration:none;border:1px solid transparent;cursor:pointer;transition:background-color .2s var(--ease),transform .2s var(--ease)}
+.btn:active{transform:scale(.98)}
+.btn-main{background:var(--ink);color:var(--bg)}
+.btn-main:hover{background:#fff}
+.btn-line{border-color:var(--line);color:var(--ink);background:transparent}
+.btn-line:hover{background:rgba(232,238,236,.08)}
+
+.nav{position:fixed;inset:0 0 auto 0;z-index:30;display:flex;align-items:center;justify-content:space-between;padding:16px clamp(24px,5vw,72px)}
+.logo{font:500 20px/1 var(--serif);text-decoration:none}
+.nav .btn{height:40px;padding:0 16px;font-size:15px}
+
+/* scène 3D collée + étapes qui défilent par-dessus */
+.sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab}
+#gl:active{cursor:grabbing}
+#fallback{display:none;position:absolute;left:50%;top:50%;width:min(86vw,760px);transform:translate(-50%,-50%)}
+.nogl #fallback{display:block}
+.nogl #gl{display:none}
+.hud{position:absolute;right:clamp(24px,5vw,72px);bottom:24px;color:var(--ink2);font-size:14px}
+.steps{position:relative;z-index:2;margin-top:-100vh;margin-top:-100svh;pointer-events:none}
+.st{min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:96px clamp(24px,5vw,72px)}
+.card{pointer-events:auto;max-width:440px;transition:opacity .4s var(--ease)}
+.js .st:not(.on) .card{opacity:.18}
+.n{font:400 15px/1 var(--sans);color:var(--ink2);font-variant-numeric:tabular-nums;margin-bottom:20px}
+.card h1,.card h2{font:500 clamp(2.6rem,6vw,5.2rem)/.96 var(--serif);letter-spacing:-.03em;margin-bottom:20px}
+.card p{color:var(--ink2);margin-bottom:16px;max-width:38ch}
+.cap{font-size:15px;color:var(--ink2);margin:24px 0 12px}
+.cap b{font-weight:500;color:var(--ink)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:12px;height:44px;padding:0 16px 0 12px;border-radius:8px;border:1px solid var(--line);background:rgba(15,26,28,.6);color:var(--ink);font:400 15px/1 var(--sans);cursor:pointer;transition:background-color .2s var(--ease),border-color .2s var(--ease)}
+.chip i{width:20px;height:20px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+.chip:hover{background:rgba(232,238,236,.08)}
+.chip[aria-checked="true"]{border-color:var(--ink);background:rgba(232,238,236,.1)}
+
+.specs{max-width:1440px;margin:0 auto;padding:112px clamp(24px,5vw,72px);display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:48px;border-top:1px solid var(--line)}
+.specs h2{font:500 clamp(2.2rem,5vw,4rem)/1 var(--serif);letter-spacing:-.025em}
+.specs dl{border-top:1px solid var(--line)}
+.specs .r{display:grid;grid-template-columns:1fr auto;gap:16px;padding:20px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.specs dt{color:var(--ink2)}
+.specs dd{font:500 20px/1.2 var(--serif);font-variant-numeric:tabular-nums;text-align:right}
+.note{color:var(--ink2);font-size:14px;margin-top:16px}
+
+.visit{border-top:1px solid var(--line)}
+.visit>div{max-width:1440px;margin:0 auto;padding:112px clamp(24px,5vw,72px) 128px;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:48px;align-items:end}
+.visit h2{font:500 clamp(2.8rem,9vw,7.5rem)/.94 var(--serif);letter-spacing:-.03em}
+.visit dl{display:grid;grid-template-columns:auto 1fr;gap:12px 24px;color:var(--ink2);margin-bottom:32px}
+.visit dt{color:var(--ink)}
+.actions{display:flex;gap:12px;flex-wrap:wrap}
+footer{border-top:1px solid var(--line);color:var(--ink2);padding:24px clamp(24px,5vw,72px) 96px;font-size:14px}
+footer p{max-width:1440px;margin:0 auto}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:none;gap:8px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(15,26,28,.94);border-top:1px solid var(--line)}
+.bar .btn{flex:1}
+
+@media (max-width:860px){
+  .st{align-items:flex-end;padding-bottom:88px;padding-top:50svh}
+  .card{background:rgba(15,26,28,.84);border:1px solid var(--line);border-radius:12px;padding:20px;max-width:none}
+  .card h1,.card h2{font-size:clamp(2.2rem,10vw,3rem)}
+  .hud{display:none}
+  .specs,.visit>div{grid-template-columns:1fr;gap:32px}
+  .bar{display:flex}
+  .nav .btn{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <a class="logo" href="#top">Shape Brume</a>
+  <a class="btn btn-main" href="tel:+33500000000">Appeler</a>
+</header>
+
+<main id="top">
+  <section class="story" id="story">
+    <div class="sticky">
+      <canvas id="gl" aria-hidden="true"></canvas>
+      <svg id="fallback" viewBox="0 0 600 200" aria-hidden="true"><path d="M20 100 C20 62 120 40 300 40 C480 40 578 84 588 100 C578 116 480 160 300 160 C120 160 20 138 20 100Z" fill="#E9DFC9"/><path d="M20 100 H588" stroke="#9A8B6C" stroke-width="2"/></svg>
+      <p class="hud">Glisse sur la planche pour la tourner</p>
+    </div>
+
+    <div class="steps">
+      <article class="st on" data-i="0"><div class="card">
+        <p class="n">Atelier de shape, Capbreton</p>
+        <h1>Ta planche, dessinée à la main</h1>
+        <p>Shapes sur mesure pour les vagues landaises : beachbreaks courts, jours de petit clapot. Fais défiler pour voir comment une planche se construit.</p>
+      </div></article>
+      <article class="st" data-i="1"><div class="card">
+        <p class="n">01 / 04</p>
+        <h2>Le tracé</h2>
+        <p>On part d'un blank en mousse. Le gabarit fixe la largeur, la finesse du nez et la rondeur de la queue. Ici : 6'0, 19 1/2, nez fin, queue ronde.</p>
+      </div></article>
+      <article class="st" data-i="2"><div class="card">
+        <p class="n">02 / 04</p>
+        <h2>Le rocker</h2>
+        <p>La courbure du fond, vue de profil. Plus elle est marquée, plus la planche tourne court et passe les sections creuses.</p>
+      </div></article>
+      <article class="st" data-i="3"><div class="card">
+        <p class="n">03 / 04</p>
+        <h2>Les rails</h2>
+        <p>Les bords. Fins, ils accrochent la vague ; pleins, ils pardonnent. Je les ponce à la main, du nez vers la queue.</p>
+      </div></article>
+      <article class="st" data-i="4"><div class="card">
+        <p class="n">04 / 04</p>
+        <h2>Les ailerons</h2>
+        <p>Trois ailerons, posés au gabarit sous la queue. Choisis la couleur du nez et de la ligne.</p>
+        <p class="cap">Teinte : <b id="tname">Rouille</b></p>
+        <div class="chips" id="chips" role="radiogroup" aria-label="Choisir une teinte"></div>
+      </div></article>
+    </div>
+  </section>
+
+  <section class="specs" id="fiche">
+    <div>
+      <h2>La planche de la démo</h2>
+      <p class="note">Dimensions d'exemple pour illustrer la fiche technique. Chaque planche est dessinée sur mesure.</p>
+    </div>
+    <dl>
+      <div class="r"><dt>Longueur</dt><dd>6'0 (1,83 m)</dd></div>
+      <div class="r"><dt>Largeur</dt><dd>19 1/2 (49,5 cm)</dd></div>
+      <div class="r"><dt>Épaisseur</dt><dd>2 3/8 (6,0 cm)</dd></div>
+      <div class="r"><dt>Nez et queue</dt><dd>Nez fin, queue ronde</dd></div>
+      <div class="r"><dt>Ailerons</dt><dd>Trois</dd></div>
+      <div class="r"><dt>Délai</dt><dd>À convenir sur devis</dd></div>
+    </dl>
+  </section>
+
+  <section class="visit" id="atelier">
+    <div>
+      <h2>Parle-moi de tes vagues</h2>
+      <div>
+        <dl>
+          <dt>Lieu</dt><dd>Capbreton (40), adresse d'exemple</dd>
+          <dt>Atelier</dt><dd>Sur rendez-vous, du lundi au samedi (exemple)</dd>
+          <dt>Téléphone</dt><dd>05 00 00 00 00 (numéro fictif)</dd>
+        </dl>
+        <div class="actions">
+          <a class="btn btn-main" href="tel:+33500000000">Appeler</a>
+          <a class="btn btn-line" href="mailto:contact@exemple.invalid">Écrire</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><p>Démo fictive réalisée par QG pour montrer un effet de site. Aucune entreprise réelle, tous les textes sont inventés, la planche est calculée en code. Direction visuelle inspirée de unslop by @heydamir (CC BY 4.0).</p></footer>
+
+<div class="bar">
+  <a class="btn btn-main" href="tel:+33500000000">Appeler</a>
+  <a class="btn btn-line" href="mailto:contact@exemple.invalid">Écrire</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<script>
+(function(){
+  document.documentElement.classList.add('js');
+  var root=document.documentElement;
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* étapes : l'étape active suit le défilement */
+  var stepEls=[].slice.call(document.querySelectorAll('.st')), current=0;
+  var TARGETS=[
+    {roll:1.18,yaw:-.22,wire:0,fins:0},   /* accueil : le pont, légèrement de biais */
+    {roll:1.5,yaw:0,wire:1,fins:0},        /* tracé : à plat, maillage visible */
+    {roll:.04,yaw:0,wire:0,fins:0},        /* rocker : de profil */
+    {roll:.5,yaw:-1.3,wire:0,fins:0},      /* rails : vu depuis le nez */
+    {roll:-1.28,yaw:.2,wire:0,fins:1}      /* ailerons : le fond, ailerons sortis */
+  ];
+  var drag={roll:0,yaw:0};
+  var onStep=function(){};
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(en){
+        if(!en.isIntersecting) return;
+        var i=+en.target.getAttribute('data-i');
+        current=i; drag.roll=0; drag.yaw=0;
+        stepEls.forEach(function(e){e.classList.toggle('on',e===en.target)});
+        onStep();
+      });
+    },{rootMargin:'-45% 0px -45% 0px'});
+    stepEls.forEach(function(e){io.observe(e)});
+  }
+
+  /* barre mobile */
+  var bar=document.querySelector('.bar');
+  window.addEventListener('scroll',function(){bar.style.transform=window.scrollY>window.innerHeight*.6?'none':'translateY(100%)';},{passive:true});
+  bar.style.transform='translateY(100%)'; bar.style.transition='transform .3s cubic-bezier(.2,.7,.2,1)';
+
+  /* teintes */
+  var TINTS=[{n:'Rouille',c:'#B9532B'},{n:'Océan',c:'#2F7C93'},{n:'Pin',c:'#4E7A52'},{n:'Sable',c:null,show:'#D9C79A'}];
+  var tint=TINTS[0].c, tex, redraw=function(){};
+  var chips=document.getElementById('chips'), tname=document.getElementById('tname');
+  TINTS.forEach(function(t,i){
+    var b=document.createElement('button');
+    b.type='button'; b.className='chip'; b.setAttribute('role','radio'); b.setAttribute('aria-checked',i===0?'true':'false');
+    b.innerHTML='<i style="--c:'+(t.c||t.show)+'"></i>'+t.n;
+    b.addEventListener('click',function(){
+      tint=t.c; tname.textContent=t.n;
+      [].forEach.call(chips.children,function(c){c.setAttribute('aria-checked',c===b?'true':'false')});
+      redraw();
+    });
+    chips.appendChild(b);
+  });
+
+  /* ---------- 3D ---------- */
+  var canvas=document.getElementById('gl'), body=document.body;
+  var renderer;
+  try{
+    if(!window.THREE) throw new Error('three absent');
+    renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:true,powerPreference:'low-power'});
+  }catch(err){ body.classList.add('nogl'); return; }
+
+  var L=6, HW=.81, T=.2;
+  function halfW(u){var a=Math.abs(u),f;
+    if(u>=0) f=Math.pow(1-Math.pow(a,2.1),.62); else f=.22+.78*Math.pow(1-Math.pow(a,2.6),.6);
+    return HW*f;}
+  function thick(u){return T*Math.pow(1-Math.pow(Math.abs(u),2.2),.55);}
+  function rocker(s){return .42*Math.pow(Math.max(s-.55,0)/.45,2.2)+.08*Math.pow(Math.max(.25-s,0)/.25,2);}
+  function boardGeo(nu,nv,part){
+    var pos=[],uv=[],idx=[],i,j;
+    for(i=0;i<=nu;i++){
+      var u=-1+2*i/nu, s=(u+1)/2, hw=halfW(u), t=thick(u), r=rocker(s);
+      for(j=0;j<=nv;j++){
+        var v=-1+2*j/nv;
+        var y=part==='top' ? r+t*.55*Math.sqrt(Math.max(0,1-v*v)) : r-t*.45*Math.sqrt(Math.max(0,1-Math.pow(v,4)));
+        pos.push(u*L/2,y,v*hw); uv.push(i/nu,(v+1)/2);
+      }
+    }
+    for(i=0;i<nu;i++) for(j=0;j<nv;j++){
+      var a=i*(nv+1)+j, b=(i+1)*(nv+1)+j, c=a+1, d=b+1;
+      if(part==='top'){ idx.push(a,c,b, b,c,d); } else { idx.push(a,b,c, b,d,c); }
+    }
+    var g=new THREE.BufferGeometry();
+    g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+    g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));
+    g.setIndex(idx); g.computeVertexNormals();
+    return g;
+  }
+
+  /* texture dessinée en canvas : pont crème, nez teinté, ligne fine, stringer */
+  var tc=document.createElement('canvas'); tc.width=1024; tc.height=256;
+  var ctx=tc.getContext('2d');
+  tex=new THREE.CanvasTexture(tc);
+  if(THREE.SRGBColorSpace){ tex.colorSpace=THREE.SRGBColorSpace; } else { tex.encoding=THREE.sRGBEncoding; renderer.outputEncoding=THREE.sRGBEncoding; }
+  tex.anisotropy=4;
+  redraw=function(){
+    ctx.fillStyle='#E9DFC9'; ctx.fillRect(0,0,1024,256);
+    if(tint){ ctx.fillStyle=tint; ctx.fillRect(880,0,144,256); }
+    ctx.fillStyle=tint||'#8A7A5A'; ctx.fillRect(300,0,6,256); ctx.fillRect(320,0,2,256);
+    ctx.fillStyle='rgba(60,45,30,.3)'; ctx.fillRect(0,126,1024,4);
+    tex.needsUpdate=true; need();
+  };
+
+  var scene=new THREE.Scene();
+  var camera=new THREE.PerspectiveCamera(30,1,.1,100);
+  scene.add(new THREE.HemisphereLight(0xffffff,0x203033,.85));
+  var key=new THREE.DirectionalLight(0xffffff,.95); key.position.set(3,6,5); scene.add(key);
+  var fill=new THREE.DirectionalLight(0xbfd8e0,.35); fill.position.set(-5,1,-4); scene.add(fill);
+
+  var mat=new THREE.MeshStandardMaterial({map:tex,roughness:.3,metalness:0,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1});
+  var boardG=new THREE.Group(), wireG=new THREE.Group();
+  boardG.add(new THREE.Mesh(boardGeo(80,32,'top'),mat));
+  boardG.add(new THREE.Mesh(boardGeo(80,32,'bot'),mat));
+  var wmat=new THREE.MeshBasicMaterial({color:0x1F5F73,wireframe:true,transparent:true,opacity:0});
+  ['top','bot'].forEach(function(p){var m=new THREE.Mesh(boardGeo(32,12,p),wmat);m.scale.set(1.003,1.003,1.003);wireG.add(m);});
+  wireG.visible=false; boardG.add(wireG);
+
+  /* ailerons */
+  var fs=new THREE.Shape();
+  fs.moveTo(0,0); fs.lineTo(.6,0); fs.quadraticCurveTo(.45,-.28,.1,-.5); fs.quadraticCurveTo(.02,-.2,0,0);
+  var fgeo=new THREE.ExtrudeGeometry(fs,{depth:.035,bevelEnabled:false}); fgeo.translate(0,0,-.0175);
+  var fmat=new THREE.MeshStandardMaterial({color:0xCFC4AE,roughness:.45});
+  var finG=new THREE.Group();
+  [[-2.55,0,0],[-2.2,.5,-.09],[-2.2,-.5,.09]].forEach(function(f){
+    var m=new THREE.Mesh(fgeo,fmat), u=f[0]/(L/2);
+    m.position.set(f[0],rocker((u+1)/2)-thick(u)*.45+.02,f[1]); m.rotation.y=f[2];
+    finG.add(m);
+  });
+  finG.scale.y=.001; boardG.add(finG);
+
+  var spin=new THREE.Group(); spin.add(boardG);
+  var holder=new THREE.Group(); holder.add(spin);
+  var rootG=new THREE.Group(); rootG.add(holder); scene.add(rootG);
+
+  /* cadrage : paysage, planche à droite ; portrait, planche debout en haut */
+  function layout(){
+    var w=canvas.clientWidth||innerWidth, h=canvas.clientHeight||innerHeight, a=w/h, tn=Math.tan(15*Math.PI/180);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+    renderer.setSize(w,h,false);
+    camera.aspect=a;
+    if(a<.9){
+      var hh=(L*.5)/.58; camera.position.set(0,0,hh/tn);
+      holder.rotation.z=Math.PI/2; rootG.position.set(0,hh*.2,0);
+    } else {
+      var hw=(L*.5)/.6, d=Math.max(hw/(tn*a),7); camera.position.set(0,0,d);
+      holder.rotation.z=0; rootG.position.set(a>1.2?d*tn*a*.28:0,a>1.2?0:d*tn*.18,0);
+    }
+    camera.lookAt(0,0,0); camera.updateProjectionMatrix(); need();
+  }
+
+  /* boucle à la demande : on ne dessine que quand quelque chose bouge */
+  var cur={roll:TARGETS[0].roll,yaw:TARGETS[0].yaw,wire:0,fins:0}, raf=0;
+  function draw(){
+    var t=TARGETS[current], tg={roll:t.roll+drag.roll,yaw:t.yaw+drag.yaw,wire:t.wire,fins:t.fins}, moving=false, k;
+    for(k in tg){
+      var dlt=tg[k]-cur[k], e=reduce?1:.085;
+      if(Math.abs(dlt)>.0006){cur[k]+=dlt*e;moving=true;} else cur[k]=tg[k];
+    }
+    spin.rotation.x=cur.roll; spin.rotation.y=cur.yaw;
+    wmat.opacity=cur.wire*.55; wireG.visible=cur.wire>.01;
+    finG.scale.y=Math.max(cur.fins,.001); finG.visible=cur.fins>.01;
+    renderer.render(scene,camera);
+    raf=moving?requestAnimationFrame(draw):0;
+  }
+  function need(){ if(!raf) raf=requestAnimationFrame(draw); }
+  onStep=need;
+
+  /* glisser pour tourner (le défilement vertical reste libre au doigt) */
+  var dn=false,lx=0,ly=0;
+  canvas.addEventListener('pointerdown',function(e){dn=true;lx=e.clientX;ly=e.clientY;try{canvas.setPointerCapture(e.pointerId)}catch(_){}});
+  canvas.addEventListener('pointermove',function(e){
+    if(!dn) return;
+    drag.roll+=(e.clientX-lx)*.008; drag.yaw+=(e.pointerType==='mouse'?(e.clientY-ly)*.006:0);
+    drag.roll=Math.max(-3.2,Math.min(3.2,drag.roll)); drag.yaw=Math.max(-.9,Math.min(.9,drag.yaw));
+    lx=e.clientX;ly=e.clientY;need();
+  });
+  var up=function(){dn=false}; canvas.addEventListener('pointerup',up); canvas.addEventListener('pointercancel',up);
+
+  canvas.addEventListener('webglcontextlost',function(e){e.preventDefault();body.classList.add('nogl')});
+  window.addEventListener('resize',layout);
+  redraw(); layout();
+})();
+</script>
+</body>
+</html>
