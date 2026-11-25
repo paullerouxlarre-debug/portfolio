@@ -22,3 +22,7 @@ Hébergement prévu : GitHub Pages (branche `main`, dossier racine).
 - Sources : les commits des dépôts GitHub listés dans `data/sources.json`, et les lignes de `data/journal-manuel.json`.
 - Le robot `.github/workflows/journal.yml` relance la collecte toutes les 6 heures (et à la main : onglet Actions → « Journal du bac » → Run workflow).
 - Projets du QG (privé) : seules les sections `## Journal public` des pages projet portant `portfolio: <id>` dans leur en-tête sont reprises, avec `python3 outils/maj.py --qg ~/Documents/CLAUDE/QG`, puis commit et push. Format d'une ligne : `- 2026-11-25 — Ce qui a changé`.
+
+## Publier une nouvelle version
+
+À chaque changement de `index.html`, `style.css`, `app.js` ou `projects.js` : augmenter le numéro dans `version.json`, dans `window.BAC_VERSION` et dans les `?v=` de `index.html`. Les visiteurs qui ont l'ancienne page en mémoire la rechargent alors tout seuls.
