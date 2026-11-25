@@ -137,7 +137,7 @@
   function fill(p) {
     playing = p;
     player.style.setProperty("--c1", p.c[0]); player.style.setProperty("--c2", p.c[1]);
-    $("vlabel").innerHTML = `<span>${esc(p.title)}</span><small>${p.k} · ${rpm === 45 ? "45" : "33⅓"}</small>`;
+    $("vlabel").innerHTML = `<span>${esc(p.title)}</span><small>${p.k} · 33⅓</small>`;
     $("pN").textContent = `Face ${CATS[p.cat].face} · ${CATS[p.cat].label} · ${p.k}`;
     $("pY").textContent = p.year + (p.status ? " · " + p.status : "");
     spotify.show(p);
@@ -158,16 +158,21 @@
     const j = JOURNAL?.projects?.[p.id];
     $("pY").textContent = p.year + (p.status ? " · " + p.status : "") + (j ? " · màj " + fmt(j.last) : "");
   }
-  // deckOn = bras posé + plateau qui tourne (+ musique si le disque en a une)
-  let deckOn = false, startedAt = 0, rpm = 33;
+  // ── platine : un seul état « deckOn » = plateau lancé + diamant sur le disque (+ musique) ──
+  const tt = player.querySelector(".tt"), arm = player.querySelector(".arm"), ss = $("ss");
+  const ARM_REST = -2, ARM_PLAY = 21, ARM_MAX = 30;
+  let deckOn = false, startedAt = 0;
+  function setArm(deg, animate = true) {
+    arm.style.transition = animate ? "" : "none";
+    arm.style.transform = `rotate(${deg}deg)`;
+  }
   function setDeck(on, { music = true, sound = true } = {}) {
     deckOn = on;
     player.classList.toggle("spinning", on);
     player.classList.remove("needs-start");
-    $("dStart").setAttribute("aria-pressed", on);
-    $("dStart").querySelector("span").textContent = on ? "Stop" : "Start";
-    $("dArm").setAttribute("aria-pressed", on);
-    $("dArm").querySelector("span").textContent = on ? "Lever le bras" : "Poser le bras";
+    ss.setAttribute("aria-pressed", on);
+    ss.setAttribute("aria-label", on ? "Stop" : "Start");
+    setArm(on ? ARM_PLAY : ARM_REST);
     if (on) { startedAt = Date.now(); if (sound) audio.drop(playing); if (music) spotify.play(); }
     else { audio.stop(); if (music) spotify.pause(); }
   }
@@ -178,32 +183,80 @@
   function spinUp() {
     timers.forEach(clearTimeout); timers = [];
     setDeck(false, { music: false });
+    rot = 0; speed = 0;
     player.classList.remove("loaded");
     void player.offsetWidth;
     later(() => player.classList.add("loaded"), 60);
     later(() => audio.isOn() ? setDeck(true) : player.classList.add("needs-start"), 1000);
     later(() => { if (deckOn && playing?.song && spotify.paused()) blocked(); }, 5000);
   }
-  function setRpm(v) {
-    rpm = v;
-    player.style.setProperty("--rpm", v === 45 ? "1.33s" : "1.8s");
-    document.querySelectorAll("[data-rpm]").forEach(b => b.setAttribute("aria-pressed", +b.dataset.rpm === v));
-    $("ledTxt").textContent = v === 45 ? "45 tours" : "33 ⅓ tours";
-    const sm = $("vlabel").querySelector("small"); if (sm && playing) sm.textContent = `${playing.k} · ${v === 45 ? "45" : "33⅓"}`;
-    audio.tick();
-  }
-  function scratch() {
-    const pl = player.querySelector(".platter");
-    pl.classList.remove("scratch"); void pl.offsetWidth; pl.classList.add("scratch");
-    audio.scratch();
-  }
-  $("dStart").onclick = () => setDeck(!deckOn);
-  $("dArm").onclick = () => setDeck(!deckOn, { sound: true });
-  player.querySelector(".arm").addEventListener("click", () => setDeck(!deckOn));
-  player.querySelector(".knob").addEventListener("click", () => setDeck(!deckOn));
-  $("vinyl").addEventListener("click", scratch);
-  document.querySelectorAll("[data-rpm]").forEach(b => b.onclick = () => setRpm(+b.dataset.rpm));
-  $("dEject").onclick = () => closePlayer();
+  ss.addEventListener("click", () => { audio.tick(); setDeck(!deckOn); });
+
+  // Plateau : accélère au départ, freine à l'arrêt, se fait tourner à la main (scratch)
+  const label = $("vlabel"), vinyl = $("vinyl");
+  const RPM = 200; // degrés par seconde, environ 33 tours/min
+  let rot = 0, speed = 0, last = performance.now(), grab = null;
+  (function loop(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (!grab) {
+      const target = deckOn ? RPM : 0;
+      speed += (target - speed) * Math.min(1, dt * (deckOn ? 2.6 : 1.4));
+      if (Math.abs(speed) < 0.5 && !deckOn) speed = 0;
+      rot += speed * dt;
+    }
+    label.style.transform = `rotate(${rot}deg)`;
+    requestAnimationFrame(loop);
+  })(last);
+  const centerAngle = (ev, el) => {
+    const r = el.getBoundingClientRect();
+    return Math.atan2(ev.clientY - (r.top + r.height / 2), ev.clientX - (r.left + r.width / 2)) * 180 / Math.PI;
+  };
+  vinyl.addEventListener("pointerdown", ev => {
+    ev.preventDefault(); try { vinyl.setPointerCapture(ev.pointerId); } catch (e) {}
+    grab = { a: centerAngle(ev, vinyl), moved: 0, lastSnd: 0 };
+    player.classList.add("scratching");
+  });
+  vinyl.addEventListener("pointermove", ev => {
+    if (!grab) return;
+    const a = centerAngle(ev, vinyl);
+    let d = a - grab.a; if (d > 180) d -= 360; if (d < -180) d += 360;
+    rot += d; grab.a = a; grab.moved += Math.abs(d);
+    if (Math.abs(d) > 4 && performance.now() - grab.lastSnd > 110) { audio.scratch(Math.sign(d)); grab.lastSnd = performance.now(); }
+  });
+  const release = () => {
+    if (!grab) return;
+    if (grab.moved < 3) { rot -= 24; audio.scratch(-1); } // petit coup de doigt
+    grab = null; player.classList.remove("scratching");
+  };
+  vinyl.addEventListener("pointerup", release);
+  vinyl.addEventListener("pointercancel", release);
+
+  // Bras : on le saisit et on pose le diamant sur le disque (ou on le relève)
+  let armDrag = null;
+  const pivot = () => { const r = tt.getBoundingClientRect(); return { x: r.left + r.width * 0.885, y: r.top + r.height * 0.136 }; };
+  arm.addEventListener("pointerdown", ev => {
+    ev.preventDefault(); ev.stopPropagation(); try { arm.setPointerCapture(ev.pointerId); } catch (e) {}
+    armDrag = { moved: false, deg: deckOn ? ARM_PLAY : ARM_REST, startX: ev.clientX, startY: ev.clientY };
+    player.classList.add("arm-grab");
+  });
+  arm.addEventListener("pointermove", ev => {
+    if (!armDrag) return;
+    if (Math.hypot(ev.clientX - armDrag.startX, ev.clientY - armDrag.startY) > 4) armDrag.moved = true;
+    if (!armDrag.moved) return;
+    const p = pivot();
+    let deg = -Math.atan2(ev.clientX - p.x, ev.clientY - p.y) * 180 / Math.PI;
+    deg = Math.max(ARM_REST, Math.min(ARM_MAX, deg));
+    armDrag.deg = deg; setArm(deg, false);
+  });
+  const armUp = () => {
+    if (!armDrag) return;
+    const { moved, deg } = armDrag; armDrag = null; player.classList.remove("arm-grab");
+    if (!moved) { setDeck(!deckOn); return; }            // simple clic : start / stop
+    const onRecord = deg > 11;
+    if (onRecord !== deckOn) setDeck(onRecord); else setArm(deckOn ? ARM_PLAY : ARM_REST);
+  };
+  arm.addEventListener("pointerup", armUp);
+  arm.addEventListener("pointercancel", armUp);
   function openPlayer(p) {
     if (!p) return;
     lastFocus = document.activeElement;
@@ -278,15 +331,16 @@
       on = !on; localStorage.setItem("bac-son", on ? "1" : "0"); paint();
       if (on) { ac().resume(); tick(); if (player.classList.contains("open") && !deckOn) setDeck(true); } else if (deckOn) setDeck(false);
     };
-    function scratch() {
+    function scratch(dir = 1) {
       if (!on) return;
       const c = ac(), t = c.currentTime, src = c.createBufferSource();
       const b = c.createBuffer(1, c.sampleRate * 0.35, c.sampleRate), d = b.getChannelData(0);
       for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
       src.buffer = b;
       const bp = c.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = 6;
-      bp.frequency.setValueAtTime(300, t); bp.frequency.exponentialRampToValueAtTime(2400, t + 0.12); bp.frequency.exponentialRampToValueAtTime(250, t + 0.3);
-      const g = c.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.5, t + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.33);
+      const f0 = dir > 0 ? 350 : 1800, f1 = dir > 0 ? 2200 : 300;
+      bp.frequency.setValueAtTime(f0, t); bp.frequency.exponentialRampToValueAtTime(f1, t + 0.14);
+      const g = c.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.45, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
       src.connect(bp).connect(g).connect(c.destination); src.start(t);
     }
     return { isOn: () => on, drop, stop, scratch, tick: () => {
