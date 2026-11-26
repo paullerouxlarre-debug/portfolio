@@ -1,9 +1,27 @@
 {
- "generated": "2026-11-25T21:32:09Z",
+ "generated": "2026-11-26T07:31:33Z",
  "projects": {
   "cartonnages-larre": {
-   "last": "2026-11-25",
+   "last": "2026-11-26",
    "entries": [
+    {
+     "date": "2026-11-26",
+     "text": "Film v11 : rendu retravaillé, habillage des machines, nouvelle musique",
+     "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/85fdae7eabae30e0692192fddcfa73e9f83fef0b",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-25",
+     "text": "Film : objectif avec occlusion ambiante, halo, étalonnage et grain ; caméra à main ; habillage des machines ; musique calée sur la cadence de la presse",
+     "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/1e085364606656a57f956cbd2e7a43478fb61864",
+     "source": "github"
+    },
+    {
+     "date": "2026-11-25",
+     "text": "Accueil : étapes jouées au bouton, page libre, fiches lisibles à chaque arrêt, étui dégagé du texte, rotation de la boîte sans sélection",
+     "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/17132ef1e0f10e96b0c93c8abcd9094ae64712dc",
+     "source": "github"
+    },
     {
      "date": "2026-11-25",
      "text": "Accueil : ouverture pilotée par étapes (gestes et boutons), page tenue en haut, rythme par encre, déchets évacués, boîte centrée et tournable",
@@ -20,24 +38,6 @@
      "date": "2026-11-25",
      "text": "Accueil : repères de défilement visibles, étape en cours affichée, chapitres ralentis",
      "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/3398f9379c5337c85c53f8de7f72bf4879b028c7",
-     "source": "github"
-    },
-    {
-     "date": "2026-11-25",
-     "text": "Film : rendu HD suréchantillonné, plus lumineux, avec musique originale",
-     "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/8826d7725bb31cd41997ac6d7df22992e190582c",
-     "source": "github"
-    },
-    {
-     "date": "2026-11-25",
-     "text": "Accueil : arrêts sur scènes posées, grain hors de la feuille ; film plus lumineux, rendu suréchantillonné, musique originale",
-     "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/170b3c2402326543ce0c11900698b9f271c89f95",
-     "source": "github"
-    },
-    {
-     "date": "2026-11-24",
-     "text": "Accueil : sujet en grand, grain de papier, orange réservé à l'accent",
-     "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/e86dfce571f6b63a9de5ec84d367de2b7ce24238",
      "source": "github"
     }
    ]
@@ -338,19 +338,19 @@
  },
  "feed": [
   {
-   "date": "2026-11-25",
+   "date": "2026-11-26",
    "id": "cartonnages-larre",
-   "text": "Accueil : ouverture pilotée par étapes (gestes et boutons), page tenue en haut, rythme par encre, déchets évacués, boîte centrée et tournable",
-   "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/5abc2ff0be450398f3d072269d52a927f2163ca2",
-   "source": "github",
-   "more": 4
+   "text": "Film v11 : rendu retravaillé, habillage des machines, nouvelle musique",
+   "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/85fdae7eabae30e0692192fddcfa73e9f83fef0b",
+   "source": "github"
   },
   {
-   "date": "2026-11-24",
+   "date": "2026-11-25",
    "id": "cartonnages-larre",
-   "text": "Accueil : sujet en grand, grain de papier, orange réservé à l'accent",
-   "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/e86dfce571f6b63a9de5ec84d367de2b7ce24238",
-   "source": "github"
+   "text": "Film : objectif avec occlusion ambiante, halo, étalonnage et grain ; caméra à main ; habillage des machines ; musique calée sur la cadence de la presse",
+   "url": "https://github.com/paullerouxlarre-debug/cartonnages-larre/commit/1e085364606656a57f956cbd2e7a43478fb61864",
+   "source": "github",
+   "more": 6
   },
   {
    "date": "2026-11-23",
