@@ -1,6 +1,6 @@
 :root{
   --cream:#efe6d5; --paper:#f6efe2; --ink:#1b1714; --rust:#e4572e; --mustard:#f2b134; --pine:#2e4a3f; --wood:#8a5a34; --wood2:#6b4426;
-  --sleeve:min(300px,58vw);
+  --sleeve:min(300px,58vw,calc((100vh - 330px) * .66));
   --serif:"Fraunces",Georgia,serif; --mono:"Space Mono",ui-monospace,monospace; --sans:"Inter",system-ui,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -45,7 +45,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;opa
 .div[aria-pressed=true]{background:var(--ink);color:var(--cream);transform:translateY(-4px)}
 
 /* ── le bac ── */
-.crate{margin-top:18px!important;position:relative;height:calc(var(--sleeve)*1.55);max-height:560px;min-height:360px;margin:0 auto;max-width:1400px;overflow:hidden;touch-action:pan-y;user-select:none;cursor:grab}
+.crate{margin-top:14px!important;position:relative;height:calc(var(--sleeve)*1.5);max-height:560px;min-height:200px;margin:0 auto;max-width:1400px;overflow:hidden;touch-action:pan-y;user-select:none;cursor:grab}
 .crate.dragging{cursor:grabbing}
 .rail{position:absolute;inset:0;perspective:1100px;perspective-origin:50% 30%}
 .sleeve{position:absolute;left:50%;top:12%;width:var(--sleeve);aspect-ratio:1;margin-left:calc(var(--sleeve)/-2);transform-style:preserve-3d;transition:transform .65s cubic-bezier(.2,.8,.2,1),opacity .5s;will-change:transform}
@@ -241,3 +241,13 @@ footer{background:var(--ink);color:rgba(239,230,213,.55);text-align:center;paddi
 .deck-tip{font:11px/1.5 var(--mono);text-align:center;opacity:.5}
 .led{display:none}
 @keyframes pulse{50%{box-shadow:0 5px 0 #6f685e,0 0 0 7px rgba(58,157,93,.45)}}
+
+/* ── bac fixé à l'écran pendant le défilement ── */
+.bac-scroll{position:relative;scroll-margin-top:var(--top,58px)}
+.bac-sticky{position:sticky;top:var(--top,58px);height:calc(100vh - var(--top,58px));display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.bac-sticky .dividers{padding-top:6px}
+.bac-sticky .now{min-height:0;padding:12px 16px 4px}
+.bac-sticky .controls{padding:6px 0 8px}
+.bac-sticky .hint{margin-top:0;padding-bottom:6px}
+@media (max-height:760px){.bac-sticky .now p{display:none}.bac-sticky .now h2{font-size:clamp(22px,3vw,34px)}}
+@media (max-height:620px){.bac-sticky .hint{display:none}}

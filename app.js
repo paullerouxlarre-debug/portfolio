@@ -42,6 +42,7 @@
   // ── bac ──
   const rail = $("rail");
   function build(start) {
+    queueMicrotask(() => { sizeScroller(); if (window.scrollY > base()) window.scrollTo({ top: base() + cur * STEP }); });
     list = filter === "all" ? P.slice() : P.filter(p => p.cat === filter);
     rail.innerHTML = list.map((p, i) =>
       `<div class="sleeve" data-i="${i}" style="--c1:${p.c[0]}" role="button" tabindex="-1" aria-label="${esc(p.title)}">
@@ -66,7 +67,26 @@
     $("nowT").textContent = p.title;
     $("nowS").textContent = p.tagline;
   }
-  const go = i => { const n = Math.max(0, Math.min(list.length - 1, i)); if (n !== cur) { cur = n; layout(); tick(); } };
+  // ── le bac suit le défilement : la section est fixée à l'écran, chaque palier = une pochette ──
+  const scroller = $("bac"), STEP = 110;
+  let topH = 58;
+  const base = () => scroller.getBoundingClientRect().top + window.scrollY - topH;
+  function sizeScroller() {
+    topH = document.querySelector(".top").offsetHeight;
+    document.documentElement.style.setProperty("--top", topH + "px");
+    scroller.style.height = (window.innerHeight - topH + (list.length - 1) * STEP) + "px";
+  }
+  function fromScroll() {
+    const i = Math.max(0, Math.min(list.length - 1, Math.round((window.scrollY - base()) / STEP)));
+    if (i !== cur) { cur = i; layout(); tick(); }
+  }
+  window.addEventListener("scroll", fromScroll, { passive: true });
+  const go = i => {
+    const n = Math.max(0, Math.min(list.length - 1, i));
+    if (n === cur) return;
+    cur = n; layout(); tick();
+    window.scrollTo({ top: base() + n * STEP, behavior: "smooth" });
+  };
 
   rail.addEventListener("click", e => {
     if (moved) return;
@@ -76,24 +96,6 @@
   $("prev").onclick = () => go(cur - 1);
   $("next").onclick = () => go(cur + 1);
   $("play").onclick = () => openPlayer(list[cur]);
-
-  // molette / pavé tactile : une pochette par cran ; l'élan du pavé tactile est ignoré
-  let acc = 0, lockUntil = 0, lastMag = 0, idleT;
-  $("crate").addEventListener("wheel", e => {
-    const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-    if (!d) return;
-    if ((cur === 0 && d < 0) || (cur === list.length - 1 && d > 0)) return; // aux bords, la page défile
-    e.preventDefault();
-    const now = performance.now(), mag = Math.abs(d);
-    clearTimeout(idleT); idleT = setTimeout(() => { acc = 0; lastMag = 0; }, 200);
-    if (now < lockUntil) {                            // juste après un cran : on ignore la suite du geste
-      if (mag <= lastMag || mag < 25) lockUntil = Math.max(lockUntil, now + 90); // l'élan qui décroît prolonge
-      lastMag = mag; return;
-    }
-    lastMag = mag;
-    acc += e.deltaMode === 1 ? d * 40 : d;            // molettes « par lignes » (Firefox)
-    if (Math.abs(acc) >= 45) { go(cur + Math.sign(acc)); acc = 0; lockUntil = now + 260; }
-  }, { passive: false });
 
   // glisser / balayer (souris et doigt)
   let down = null, moved = false;
@@ -130,7 +132,7 @@
     if (e.key === "ArrowLeft") { go(cur - 1); e.preventDefault(); }
     if (e.key === "Enter" && !t?.closest("button,a")) openPlayer(list[cur]);
   });
-  window.addEventListener("resize", layout);
+  window.addEventListener("resize", () => { sizeScroller(); layout(); });
 
   // ── liste des titres ──
   const drawSides = () => $("sides").innerHTML = Object.entries(CATS).map(([k, v]) => `
