@@ -77,19 +77,22 @@
   $("next").onclick = () => go(cur + 1);
   $("play").onclick = () => openPlayer(list[cur]);
 
-  // molette : seulement le geste horizontal (pavé tactile, Maj + molette) ;
-  // le défilement vertical reste à la page. Un cran par geste, l'élan du pavé est ignoré.
-  let acc = 0, wheelT, wheelLock = 0;
+  // molette / pavé tactile : une pochette par cran ; l'élan du pavé tactile est ignoré
+  let acc = 0, lockUntil = 0, lastMag = 0, idleT;
   $("crate").addEventListener("wheel", e => {
-    const horiz = Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.2;
-    const d = horiz ? e.deltaX : (e.shiftKey ? e.deltaY : 0);
-    if (!d) return;                                   // vertical : on laisse la page défiler
+    const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    if (!d) return;
+    if ((cur === 0 && d < 0) || (cur === list.length - 1 && d > 0)) return; // aux bords, la page défile
     e.preventDefault();
-    const now = performance.now();
-    clearTimeout(wheelT); wheelT = setTimeout(() => { acc = 0; }, 180);
-    if (now < wheelLock) return;                      // élan du geste précédent
-    acc += d;
-    if (Math.abs(acc) > 40) { go(cur + Math.sign(acc)); acc = 0; wheelLock = now + 260; }
+    const now = performance.now(), mag = Math.abs(d);
+    clearTimeout(idleT); idleT = setTimeout(() => { acc = 0; lastMag = 0; }, 200);
+    if (now < lockUntil) {                            // juste après un cran : on ignore la suite du geste
+      if (mag <= lastMag || mag < 25) lockUntil = Math.max(lockUntil, now + 90); // l'élan qui décroît prolonge
+      lastMag = mag; return;
+    }
+    lastMag = mag;
+    acc += e.deltaMode === 1 ? d * 40 : d;            // molettes « par lignes » (Firefox)
+    if (Math.abs(acc) >= 45) { go(cur + Math.sign(acc)); acc = 0; lockUntil = now + 260; }
   }, { passive: false });
 
   // glisser / balayer (souris et doigt)
