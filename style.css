@@ -246,6 +246,7 @@ footer{background:var(--ink);color:rgba(239,230,213,.55);text-align:center;paddi
 .bac-scroll{position:relative;scroll-margin-top:var(--top,58px)}
 .bac-sticky{position:sticky;top:var(--top,58px);height:calc(100vh - var(--top,58px));display:flex;flex-direction:column;justify-content:center;overflow:hidden}
 .bac-sticky .dividers{padding-top:6px}
+.bac-sticky .crate{width:100%;flex:none}
 .bac-sticky .now{min-height:0;padding:12px 16px 4px}
 .bac-sticky .controls{padding:6px 0 8px}
 .bac-sticky .hint{margin-top:0;padding-bottom:6px}
