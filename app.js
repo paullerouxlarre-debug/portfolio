@@ -77,28 +77,39 @@
   $("next").onclick = () => go(cur + 1);
   $("play").onclick = () => openPlayer(list[cur]);
 
-  // molette
-  let acc = 0, wheelT;
+  // molette : seulement le geste horizontal (pavé tactile, Maj + molette) ;
+  // le défilement vertical reste à la page. Un cran par geste, l'élan du pavé est ignoré.
+  let acc = 0, wheelT, wheelLock = 0;
   $("crate").addEventListener("wheel", e => {
-    const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-    if ((cur === 0 && d < 0) || (cur === list.length - 1 && d > 0)) return; // laisse la page défiler aux bords
-    e.preventDefault(); acc += d;
-    if (Math.abs(acc) > 50) { go(cur + Math.sign(acc)); acc = 0; }
-    clearTimeout(wheelT); wheelT = setTimeout(() => acc = 0, 160);
+    const horiz = Math.abs(e.deltaX) > Math.abs(e.deltaY) * 1.2;
+    const d = horiz ? e.deltaX : (e.shiftKey ? e.deltaY : 0);
+    if (!d) return;                                   // vertical : on laisse la page défiler
+    e.preventDefault();
+    const now = performance.now();
+    clearTimeout(wheelT); wheelT = setTimeout(() => { acc = 0; }, 180);
+    if (now < wheelLock) return;                      // élan du geste précédent
+    acc += d;
+    if (Math.abs(acc) > 40) { go(cur + Math.sign(acc)); acc = 0; wheelLock = now + 260; }
   }, { passive: false });
 
-  // glisser / balayer
+  // glisser / balayer (souris et doigt)
   let down = null, moved = false;
   const crate = $("crate");
-  crate.addEventListener("pointerdown", e => { down = { x: e.clientX, c: cur }; moved = false; });
-  window.addEventListener("pointermove", e => {
-    if (!down) return;
-    const dx = e.clientX - down.x;
-    if (Math.abs(dx) > 8) { moved = true; crate.classList.add("dragging"); }
-    const n = down.c - Math.round(dx / 70);
-    if (moved) go(n);
+  const endDrag = () => { down = null; crate.classList.remove("dragging"); setTimeout(() => moved = false, 0); };
+  crate.addEventListener("pointerdown", e => {
+    if (e.button > 0) return;
+    down = { x: e.clientX, y: e.clientY, c: cur, id: e.pointerId }; moved = false;
   });
-  window.addEventListener("pointerup", () => { down = null; crate.classList.remove("dragging"); setTimeout(() => moved = false, 0); });
+  window.addEventListener("pointermove", e => {
+    if (!down || e.pointerId !== down.id) return;
+    if (e.pointerType === "mouse" && e.buttons === 0) return endDrag(); // bouton relâché hors de la page
+    const dx = e.clientX - down.x;
+    if (!moved && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(e.clientY - down.y)) { moved = true; crate.classList.add("dragging"); }
+    if (moved) go(down.c - Math.round(dx / 80));
+  });
+  window.addEventListener("pointerup", endDrag);
+  window.addEventListener("pointercancel", endDrag);
+  window.addEventListener("blur", endDrag);
 
   // clavier
   document.addEventListener("keydown", e => {
@@ -412,7 +423,12 @@
     fetch("data/journal.json?t=" + Date.now()).then(r => r.ok ? r.json() : null).then(j => {
       if (!j) return;
       JOURNAL = j;
-      build(cur); drawSides();
+      // ajoute les rubans « Neuf » sans reconstruire le bac (évite de couper un mouvement)
+      rail.querySelectorAll(".sleeve").forEach((el, i) => {
+        const art = el.querySelector(".art");
+        if (art && isFresh(list[i]) && !art.querySelector(".ribbon")) art.insertAdjacentHTML("afterbegin", `<div class="ribbon">Neuf</div>`);
+      });
+      drawSides();
       const byId = Object.fromEntries(P.map(p => [p.id, p]));
       const feed = j.feed.filter(e => byId[e.id]);
       $("feed").innerHTML = feed.slice(0, 12).map(e => {

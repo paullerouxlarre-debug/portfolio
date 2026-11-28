@@ -48,14 +48,15 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;opa
 .crate{margin-top:18px!important;position:relative;height:calc(var(--sleeve)*1.55);max-height:560px;min-height:360px;margin:0 auto;max-width:1400px;overflow:hidden;touch-action:pan-y;user-select:none;cursor:grab}
 .crate.dragging{cursor:grabbing}
 .rail{position:absolute;inset:0;perspective:1100px;perspective-origin:50% 30%}
-.sleeve{position:absolute;left:50%;top:12%;width:var(--sleeve);aspect-ratio:1;margin-left:calc(var(--sleeve)/-2);transform-style:preserve-3d;transition:transform .65s cubic-bezier(.2,.8,.2,1),filter .5s,opacity .5s;will-change:transform}
+.sleeve{position:absolute;left:50%;top:12%;backface-visibility:hidden;width:var(--sleeve);aspect-ratio:1;margin-left:calc(var(--sleeve)/-2);transform-style:preserve-3d;transition:transform .65s cubic-bezier(.2,.8,.2,1),filter .5s,opacity .5s;will-change:transform}
 .sleeve .face{position:absolute;inset:0;border-radius:4px;overflow:hidden;box-shadow:0 30px 40px -20px rgba(0,0,0,.55),0 2px 0 rgba(255,255,255,.25) inset;backface-visibility:hidden}
 .sleeve .disc{position:absolute;inset:4%;border-radius:50%;background:repeating-radial-gradient(#111 0 1.5px,#262220 1.5px 3px);transform:translateZ(-2px);transition:transform .6s cubic-bezier(.2,.8,.2,1)}
 .sleeve .disc::after{content:"";position:absolute;inset:34%;border-radius:50%;background:var(--c1)}
 .sleeve.current .face{box-shadow:0 40px 50px -20px rgba(0,0,0,.6)}
 .sleeve.current .disc{transform:translateZ(-2px) translateX(22%)}
 .sleeve.current:hover .disc{transform:translateZ(-2px) translateX(38%) rotate(40deg)}
-.sleeve:not(.current){filter:brightness(.78) saturate(.85)}
+.sleeve .face::after{content:"";position:absolute;inset:0;background:#1b1714;opacity:.22;transition:opacity .5s;pointer-events:none;z-index:5}
+.sleeve.current .face::after{opacity:0}
 .sleeve.hidden{opacity:0;pointer-events:none}
 .crate-front{position:absolute;left:50%;transform:translateX(-50%);bottom:0;width:min(1100px,96vw);height:22%;border-radius:6px 6px 0 0;z-index:5;pointer-events:none;
   background:linear-gradient(180deg,rgba(255,255,255,.08),transparent 30%),repeating-linear-gradient(90deg,var(--wood) 0 140px,var(--wood2) 140px 143px);
